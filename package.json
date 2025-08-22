@@ -1,7 +1,7 @@
 {
-  "name": "claude-eval",
+  "name": "@bkper/claude-code-eval",
   "version": "1.0.0",
-  "description": "Evaluation system for AI agent responses using LLM-as-a-judge methodology",
+  "description": "Simple evaluation tool for Claude Code AI agent responses using LLM-as-a-judge methodology.",
   "type": "module",
   "main": "./dist/index.js",
   "bin": {
@@ -18,7 +18,8 @@
     "build": "tsc",
     "clean": "rm -rf dist",
     "prepublishOnly": "npm run clean && npm run build",
-    "dev": "npm run build && node dist/bin/claude-eval.js"
+    "dev": "tsc --watch --preserveWatchOutput",
+    "dev:run": "node dist/bin/claude-eval.js"
   },
   "devDependencies": {
     "@types/bun": "latest",

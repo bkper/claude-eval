@@ -2,28 +2,27 @@
 
 Simple evaluation tool for Claude Code AI agent responses using LLM-as-a-judge methodology. 
 
-Built on Claude SDK, this tool helps test and validate Claude Code responses against defined criteria. 
+Some problems faced as scale Claude Code usage:
 
-When you change a project, user or company CLAUDE.md file:
+- When you change a project, user or company CLAUDE.md file:
+  - How can you know it was a good or bad change?
+  - How can you know if the change is working as expected?
+  - How can you know if the change is breaking something for other users?
+- As the SONNET-next, OPUS-next, etc. models released, how can you know if the current setup is still working as expected?
 
-- How can you know it was a good or bad change?
-- How can you know if the change is working as expected?
-- How can you know if the change is breaking something for other users?
-
-
-The claude-eval tool was built for the Bkper team to use internally on its own projects, to help address problems above.
+Built on Claude SDK, this tool helps test and validate Claude Code responses against defined criteria, creating a eval-driven development loop for a sustainable Claude Code usage.
 
 
 ## Usage
 
-No installation required! Run directly with npm or bun:
+No installation required. Run directly with npm or bun:
 
 ```bash
 # Using npm
-npx claude-eval evals/test.yaml
+npx claude-eval evals/simple-hello-world.yaml
 
 # Using bun  
-bunx claude-eval evals/test.yaml
+bunx claude-eval evals/simple-hello-world.yaml
 ```
 
 ### Examples
