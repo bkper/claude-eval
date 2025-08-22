@@ -3,16 +3,22 @@
   "version": "1.0.0",
   "description": "Evaluation system for AI agent responses using LLM-as-a-judge methodology",
   "type": "module",
-  "private": true,
+  "main": "./dist/index.js",
   "bin": {
-    "claude-eval": "./bin/claude-eval.ts"
+    "claude-eval": "./dist/bin/claude-eval.js"
   },
+  "files": [
+    "dist/",
+    "README.md"
+  ],
   "scripts": {
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "build": "tsc",
-    "dev": "bun run bin/claude-eval.ts"
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run clean && npm run build",
+    "dev": "npm run build && node dist/bin/claude-eval.js"
   },
   "devDependencies": {
     "@types/bun": "latest",

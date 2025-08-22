@@ -1,37 +1,45 @@
 # claude-eval
 
-An evaluation system for AI agent responses using LLM-as-a-judge methodology. This tool helps test and validate Claude Code SDK responses against defined criteria.
+Simple evaluation tool for Claude Code AI agent responses using LLM-as-a-judge methodology. 
 
-## Installation
+Built on Claude SDK, this tool helps test and validate Claude Code responses against defined criteria. 
 
-```bash
-bun install
-```
+When you change a project, user or company CLAUDE.md file:
+
+- How can you know it was a good or bad change?
+- How can you know if the change is working as expected?
+- How can you know if the change is breaking something for other users?
+
+
+The claude-eval tool was built for the Bkper team to use internally on its own projects, to help address problems above.
+
 
 ## Usage
 
-### Single Evaluation
+No installation required! Run directly with npm or bun:
 
 ```bash
-bun run claude-eval evals/developer-suggest-strong-type.yaml
+# Using npm
+npx claude-eval evals/test.yaml
+
+# Using bun  
+bunx claude-eval evals/test.yaml
 ```
 
-### Multiple Evaluations (Batch)
+### Examples
 
 ```bash
-bun run claude-eval evals/*.yaml
-```
+# Single evaluation
+npx claude-eval evals/simple-hello-world.yaml
 
-### JSON Output
+# Multiple evaluations (batch)
+npx claude-eval evals/*.yaml
 
-```bash
-bun run claude-eval evals/test.yaml --format=json
-```
+# Custom concurrency
+npx claude-eval evals/*.yaml --concurrency=3
 
-### Custom Concurrency
-
-```bash
-bun run claude-eval evals/*.yaml --concurrency=3
+# JSON output
+npx claude-eval evals/simple-hello-world.yaml --format=json
 ```
 
 ## Evaluation File Format
@@ -39,6 +47,9 @@ bun run claude-eval evals/*.yaml --concurrency=3
 Evaluation files are YAML documents with the following structure:
 
 ```yaml
+
+# Evaluate if Claude suggests TypeScript for new projects
+
 prompt: >
   Create a simple hello world web application 
   to show a message "Hello World" in the browser.
@@ -49,20 +60,13 @@ expected_behavior:
   - Uses .ts file extensions
   - Do NOT recommend .js javascript files
 
-# Optional fields
-description: "Tests if Claude suggests TypeScript for new projects"
-category: "development-suggestions"
 ```
 
-## Required Fields
+## Configuration
 
+**Required:**
 - `prompt`: The prompt to send to Claude Code SDK (in plan mode)
 - `expected_behavior`: Array of criteria that the response should meet
-
-## Optional Fields
-
-- `description`: Human-readable description of what this evaluation tests
-- `category`: Category for organizing evaluations
 
 ## How It Works
 
@@ -71,36 +75,3 @@ category: "development-suggestions"
 3. **Judge Response**: Uses LLM-as-a-judge to evaluate the response against criteria
 4. **Format Results**: Displays results with ✅/❌ indicators and summary
 
-## Exit Codes
-
-- `0`: All evaluations passed
-- `1`: One or more evaluations failed or error occurred
-
-## Development
-
-### Running Tests
-
-```bash
-bun test
-```
-
-### Test Coverage
-
-```bash
-bun run test:coverage
-```
-
-### Watch Mode
-
-```bash
-bun run test:watch
-```
-
-## Architecture
-
-- **yaml-parser**: Parses and validates YAML evaluation specs
-- **claude-client**: Wrapper around Claude Code SDK
-- **judge-evaluator**: LLM-as-a-judge evaluation logic
-- **eval-runner**: Orchestrates single and batch evaluations
-- **result-formatter**: Formats output for console and JSON
-- **CLI**: Command-line interface with glob pattern support
