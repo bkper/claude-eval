@@ -4,6 +4,7 @@ import { Command } from 'commander';
 import { glob } from 'glob';
 import { EvalRunner } from '../src/eval-runner.js';
 import { ResultFormatter } from '../src/utils/result-formatter.js';
+import { ProgressReporter, type ProgressLevel } from '../src/utils/progress-reporter.js';
 
 const program = new Command();
 
@@ -14,10 +15,22 @@ program
   .argument('<files...>', 'YAML evaluation files or glob patterns')
   .option('--format <format>', 'Output format (console|json)', 'console')
   .option('--concurrency <number>', 'Number of concurrent evaluations', '5')
-  .action(async (files: string[], options: { format: string; concurrency: string }) => {
+  .option('--verbose', 'Show detailed progress including partial responses')
+  .option('--quiet', 'Suppress progress output')
+  .action(async (files: string[], options: { format: string; concurrency: string; verbose?: boolean; quiet?: boolean }) => {
     try {
       const runner = new EvalRunner();
       const formatter = new ResultFormatter();
+      
+      // Determine progress level
+      let progressLevel: ProgressLevel = 'normal';
+      if (options.quiet) {
+        progressLevel = 'quiet';
+      } else if (options.verbose) {
+        progressLevel = 'verbose';
+      }
+      
+      const progressReporter = new ProgressReporter({ level: progressLevel });
       
       // Expand glob patterns
       const expandedFiles: string[] = [];
@@ -38,7 +51,7 @@ program
       // Run evaluations
       if (expandedFiles.length === 1) {
         // Single evaluation
-        const result = await runner.runSingle(expandedFiles[0]);
+        const result = await runner.runSingle(expandedFiles[0], progressReporter);
         
         if (options.format === 'json') {
           console.log(formatter.formatJSON(result));
@@ -53,7 +66,10 @@ program
       } else {
         // Batch evaluation
         const concurrency = parseInt(options.concurrency, 10);
-        const batchResults = await runner.runBatch(expandedFiles, { concurrency });
+        const batchResults = await runner.runBatch(expandedFiles, { 
+          concurrency, 
+          progressReporter 
+        });
         
         if (options.format === 'json') {
           console.log(JSON.stringify(batchResults, null, 2));

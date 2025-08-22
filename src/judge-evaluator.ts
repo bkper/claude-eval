@@ -1,17 +1,37 @@
 import { query } from '@anthropic-ai/claude-code';
 import type { EvaluationResult, CriterionResult } from './utils/result-formatter.js';
+import { ProgressReporter } from './utils/progress-reporter.js';
 
 export type { EvaluationResult, CriterionResult };
 
 export class JudgeEvaluator {
-  async evaluate(response: string, criteria: string[]): Promise<EvaluationResult> {
+  async evaluate(response: string, criteria: string[], progressReporter?: ProgressReporter): Promise<EvaluationResult> {
+    const startTime = Date.now();
+    
+    if (progressReporter) {
+      progressReporter.stepStarted(`Evaluating response against ${criteria.length} criteria`);
+      progressReporter.debug(`Response length: ${response.length} characters`);
+    }
+    
     const judgePrompt = this.constructJudgePrompt(response, criteria);
     
     try {
       const messages = [];
+      let judgeResponseText = '';
+      
       for await (const message of query({ prompt: judgePrompt, options: { permissionMode: 'plan' } })) {
         messages.push(message);
+        
+        // Show partial judge responses in verbose mode
+        if (message.type === 'result' && progressReporter) {
+          const newContent = (message as any).result || '';
+          if (newContent && newContent.length > 0) {
+            judgeResponseText += newContent;
+            progressReporter.partialResponse(judgeResponseText, 150);
+          }
+        }
       }
+      
       const judgeResponse = messages
         .filter((msg: any) => msg.type === 'result')
         .map((msg: any) => msg.result)
@@ -20,11 +40,22 @@ export class JudgeEvaluator {
       const evaluatedCriteria = this.parseJudgeResponse(judgeResponse, criteria);
       const overall = evaluatedCriteria.every(c => c.passed);
       
+      if (progressReporter) {
+        const duration = Date.now() - startTime;
+        const passedCount = evaluatedCriteria.filter(c => c.passed).length;
+        progressReporter.stepCompleted(`Evaluation complete (${passedCount}/${criteria.length} criteria passed)`, duration);
+      }
+      
       return {
         overall,
         criteria: evaluatedCriteria
       };
     } catch (error) {
+      if (progressReporter) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        progressReporter.stepFailed('Judge evaluation', errorMessage);
+      }
+      
       // If evaluation fails, mark all criteria as failed
       const failedCriteria = criteria.map(criterion => ({
         criterion,
