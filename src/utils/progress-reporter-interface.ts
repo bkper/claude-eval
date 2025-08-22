@@ -9,4 +9,8 @@ export interface IProgressReporter {
   error(message: string): void;
   info(message: string): void;
   debug(message: string): void;
+  logPrompt(prompt: string): void;
+  logResponse(response: string): void;
+  logJudgePrompt(prompt: string): void;
+  logJudgeResponse(response: string): void;
 }

@@ -81,6 +81,10 @@ export class TerminalFormatter {
     return chalk.gray(`    → ${truncated.replace(/\n/g, ' ')}`);
   }
 
+  static formatContent(text: string): string {
+    return chalk.gray(text);
+  }
+
   static formatBatchSummary(passedCount: number, totalCount: number, duration: number): string {
     const durationText = chalk.gray(` (${(duration / 1000).toFixed(1)}s total)`);
     const summary = `${passedCount}/${totalCount} evaluations passed`;

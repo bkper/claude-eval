@@ -113,4 +113,72 @@ export class ProgressReporter implements IProgressReporter {
       console.log(chalk.gray(`🔍 ${message}`));
     }
   }
+
+  logPrompt(prompt: string): void {
+    if (this.level !== 'verbose') return;
+    
+    const truncated = this.truncateContent(prompt, 500);
+    console.log(chalk.blue(`📝 Prompt sent to Claude:`));
+    console.log(chalk.gray(`${truncated}`));
+    if (prompt.length > 500) {
+      console.log(chalk.gray(`    ... (${prompt.length} total characters)`));
+    }
+  }
+
+  logResponse(response: string): void {
+    if (this.level !== 'verbose') return;
+    
+    const truncated = this.truncateContent(response, 500);
+    console.log(chalk.green(`📄 Response received:`));
+    console.log(chalk.gray(`${truncated}`));
+    if (response.length > 500) {
+      console.log(chalk.gray(`    ... (${response.length} total characters)`));
+    }
+  }
+
+  logJudgePrompt(prompt: string): void {
+    if (this.level !== 'verbose') return;
+    
+    const truncated = this.truncateContent(prompt, 500);
+    console.log(chalk.yellow(`⚖️  Judge evaluation prompt:`));
+    console.log(chalk.gray(`${truncated}`));
+    if (prompt.length > 500) {
+      console.log(chalk.gray(`    ... (${prompt.length} total characters)`));
+    }
+  }
+
+  logJudgeResponse(response: string): void {
+    if (this.level !== 'verbose') return;
+    
+    const truncated = this.truncateContent(response, 500);
+    console.log(chalk.cyan(`🔍 Judge response:`));
+    console.log(chalk.gray(`${truncated}`));
+    if (response.length > 500) {
+      console.log(chalk.gray(`    ... (${response.length} total characters)`));
+    }
+  }
+
+  private truncateContent(content: string, maxLength: number): string {
+    if (content.length <= maxLength) {
+      return content;
+    }
+    
+    // Try to truncate at a natural break point (newline, sentence end, word boundary)
+    const truncated = content.substring(0, maxLength);
+    const lastNewline = truncated.lastIndexOf('\n');
+    const lastSentence = Math.max(truncated.lastIndexOf('.'), truncated.lastIndexOf('!'), truncated.lastIndexOf('?'));
+    const lastSpace = truncated.lastIndexOf(' ');
+    
+    // Use the best break point, preferring newline > sentence > word boundary
+    let breakPoint = maxLength;
+    if (lastNewline > maxLength * 0.7) {
+      breakPoint = lastNewline;
+    } else if (lastSentence > maxLength * 0.7) {
+      breakPoint = lastSentence + 1;
+    } else if (lastSpace > maxLength * 0.8) {
+      breakPoint = lastSpace;
+    }
+    
+    return content.substring(0, breakPoint) + (breakPoint < content.length ? '...' : '');
+  }
 }

@@ -108,4 +108,72 @@ export class BufferedRegionalReporter implements RegionalProgressReporter {
       this.buffer.add(TerminalFormatter.formatDebug(message));
     }
   }
+
+  logPrompt(prompt: string): void {
+    if (this.level !== 'verbose') return;
+    
+    const truncated = this.truncateContent(prompt, 500);
+    this.buffer.add(`📝 Prompt sent to Claude:`);
+    this.buffer.add(TerminalFormatter.formatContent(truncated));
+    if (prompt.length > 500) {
+      this.buffer.add(TerminalFormatter.formatContent(`    ... (${prompt.length} total characters)`));
+    }
+  }
+
+  logResponse(response: string): void {
+    if (this.level !== 'verbose') return;
+    
+    const truncated = this.truncateContent(response, 500);
+    this.buffer.add(`📄 Response received:`);
+    this.buffer.add(TerminalFormatter.formatContent(truncated));
+    if (response.length > 500) {
+      this.buffer.add(TerminalFormatter.formatContent(`    ... (${response.length} total characters)`));
+    }
+  }
+
+  logJudgePrompt(prompt: string): void {
+    if (this.level !== 'verbose') return;
+    
+    const truncated = this.truncateContent(prompt, 500);
+    this.buffer.add(`⚖️  Judge evaluation prompt:`);
+    this.buffer.add(TerminalFormatter.formatContent(truncated));
+    if (prompt.length > 500) {
+      this.buffer.add(TerminalFormatter.formatContent(`    ... (${prompt.length} total characters)`));
+    }
+  }
+
+  logJudgeResponse(response: string): void {
+    if (this.level !== 'verbose') return;
+    
+    const truncated = this.truncateContent(response, 500);
+    this.buffer.add(`🔍 Judge response:`);
+    this.buffer.add(TerminalFormatter.formatContent(truncated));
+    if (response.length > 500) {
+      this.buffer.add(TerminalFormatter.formatContent(`    ... (${response.length} total characters)`));
+    }
+  }
+
+  private truncateContent(content: string, maxLength: number): string {
+    if (content.length <= maxLength) {
+      return content;
+    }
+    
+    // Try to truncate at a natural break point (newline, sentence end, word boundary)
+    const truncated = content.substring(0, maxLength);
+    const lastNewline = truncated.lastIndexOf('\n');
+    const lastSentence = Math.max(truncated.lastIndexOf('.'), truncated.lastIndexOf('!'), truncated.lastIndexOf('?'));
+    const lastSpace = truncated.lastIndexOf(' ');
+    
+    // Use the best break point, preferring newline > sentence > word boundary
+    let breakPoint = maxLength;
+    if (lastNewline > maxLength * 0.7) {
+      breakPoint = lastNewline;
+    } else if (lastSentence > maxLength * 0.7) {
+      breakPoint = lastSentence + 1;
+    } else if (lastSpace > maxLength * 0.8) {
+      breakPoint = lastSpace;
+    }
+    
+    return content.substring(0, breakPoint) + (breakPoint < content.length ? '...' : '');
+  }
 }

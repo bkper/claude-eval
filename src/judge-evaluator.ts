@@ -15,11 +15,15 @@ export class JudgeEvaluator {
     
     const judgePrompt = this.constructJudgePrompt(response, criteria);
     
+    if (progressReporter) {
+      progressReporter.logJudgePrompt(judgePrompt);
+    }
+    
     try {
       const messages = [];
       let judgeResponseText = '';
       
-      for await (const message of query({ prompt: judgePrompt, options: { permissionMode: 'plan' } })) {
+      for await (const message of query({ prompt: judgePrompt, options: { permissionMode: 'default' } })) {
         messages.push(message);
         
         // Show partial judge responses in verbose mode
@@ -36,6 +40,10 @@ export class JudgeEvaluator {
         .filter((msg: any) => msg.type === 'result')
         .map((msg: any) => msg.result)
         .join('');
+      
+      if (progressReporter) {
+        progressReporter.logJudgeResponse(judgeResponse);
+      }
       
       const evaluatedCriteria = this.parseJudgeResponse(judgeResponse, criteria);
       const overall = evaluatedCriteria.every(c => c.passed);

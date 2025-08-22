@@ -16,19 +16,24 @@ export class ClaudeClient {
     if (progressReporter) {
       progressReporter.stepStarted('Executing prompt with Claude Code');
       progressReporter.debug(`Prompt length: ${prompt.length} characters`);
+      progressReporter.logPrompt(prompt);
     }
     
     const timeoutPromise = new Promise<never>((_, reject) => {
       setTimeout(() => reject(new Error('timeout')), timeout);
     });
 
-    prompt = `${prompt} - give the most detailed plan possible`
+    prompt = `Please respond to the following prompt with text only. Do not use any tools, create/modify/delete files, or execute commands. Just provide a direct text response.
+
+User prompt: ${prompt}
+
+Remember: Text response only, no file operations or tool usage.`
     
     const queryPromise = (async () => {
       const messages = [];
       let responseText = '';
       
-      for await (const message of query({ prompt, options: { permissionMode: 'plan', cwd: options.cwd } })) {
+      for await (const message of query({ prompt, options: { permissionMode: 'default', cwd: options.cwd } })) {
         messages.push(message);
         
         // Show partial responses in verbose mode
@@ -54,6 +59,7 @@ export class ClaudeClient {
         const duration = Date.now() - startTime;
         progressReporter.stepCompleted('Received response from Claude', duration);
         progressReporter.debug(`Response length: ${finalResponse.length} characters`);
+        progressReporter.logResponse(finalResponse);
       }
       
       return finalResponse;

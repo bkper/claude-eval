@@ -24,16 +24,26 @@ describe('ClaudeClient', () => {
 
     const result = await client.execute('Test prompt');
     expect(result).toBe(mockResponse);
-    expect(mockQuery).toHaveBeenCalledWith({ prompt: 'Test prompt - give the most detailed plan possible', options: { permissionMode: 'plan' } });
+    const expectedPrompt = `Please respond to the following prompt with text only. Do not use any tools, create/modify/delete files, or execute commands. Just provide a direct text response.
+
+User prompt: Test prompt
+
+Remember: Text response only, no file operations or tool usage.`;
+    expect(mockQuery).toHaveBeenCalledWith({ prompt: expectedPrompt, options: { permissionMode: 'default' } });
   });
 
-  it('should pass permissionMode: plan option to SDK', async () => {
+  it('should pass permissionMode: default option to SDK', async () => {
     mockQuery.mockImplementation(async function* () {
       yield { type: 'result', result: 'Response' };
     });
 
     await client.execute('Test prompt');
-    expect(mockQuery).toHaveBeenCalledWith({ prompt: 'Test prompt - give the most detailed plan possible', options: { permissionMode: 'plan' } });
+    const expectedPrompt = `Please respond to the following prompt with text only. Do not use any tools, create/modify/delete files, or execute commands. Just provide a direct text response.
+
+User prompt: Test prompt
+
+Remember: Text response only, no file operations or tool usage.`;
+    expect(mockQuery).toHaveBeenCalledWith({ prompt: expectedPrompt, options: { permissionMode: 'default' } });
   });
 
   it('should handle multiple message chunks and concatenate them', async () => {
