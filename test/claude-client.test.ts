@@ -1,78 +1,75 @@
-import { ClaudeClient } from '../src/claude-client';
+import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 
 // Mock the Claude Code SDK
+const mockQuery = jest.fn();
 jest.mock('@anthropic-ai/claude-code', () => ({
-  Client: jest.fn().mockImplementation(() => ({
-    query: jest.fn(),
-  })),
+  query: mockQuery,
 }));
+
+import { ClaudeClient } from '../src/claude-client';
 
 describe('ClaudeClient', () => {
   let client: ClaudeClient;
-  let mockQuery: jest.Mock;
 
   beforeEach(() => {
-    const { Client } = require('@anthropic-ai/claude-code');
-    mockQuery = jest.fn();
-    Client.mockImplementation(() => ({
-      query: mockQuery,
-    }));
-    client = new ClaudeClient();
-  });
-
-  afterEach(() => {
     jest.clearAllMocks();
+    client = new ClaudeClient();
   });
 
   it('should execute prompt and return response', async () => {
     const mockResponse = 'Test response from Claude';
-    mockQuery.mockResolvedValue([
-      { type: 'result', content: mockResponse }
-    ]);
+    mockQuery.mockImplementation(async function* () {
+      yield { type: 'result', result: mockResponse };
+    });
 
     const result = await client.execute('Test prompt');
     expect(result).toBe(mockResponse);
-    expect(mockQuery).toHaveBeenCalledWith('Test prompt', { planMode: true });
+    expect(mockQuery).toHaveBeenCalledWith({ prompt: 'Test prompt - give the most detailed plan possible', options: { permissionMode: 'plan' } });
   });
 
-  it('should pass planMode: true option to SDK', async () => {
-    mockQuery.mockResolvedValue([
-      { type: 'result', content: 'Response' }
-    ]);
+  it('should pass permissionMode: plan option to SDK', async () => {
+    mockQuery.mockImplementation(async function* () {
+      yield { type: 'result', result: 'Response' };
+    });
 
     await client.execute('Test prompt');
-    expect(mockQuery).toHaveBeenCalledWith('Test prompt', { planMode: true });
+    expect(mockQuery).toHaveBeenCalledWith({ prompt: 'Test prompt - give the most detailed plan possible', options: { permissionMode: 'plan' } });
   });
 
   it('should handle multiple message chunks and concatenate them', async () => {
-    mockQuery.mockResolvedValue([
-      { type: 'result', content: 'First part ' },
-      { type: 'result', content: 'second part' }
-    ]);
+    mockQuery.mockImplementation(async function* () {
+      yield { type: 'result', result: 'First part ' };
+      yield { type: 'result', result: 'second part' };
+    });
 
     const result = await client.execute('Test prompt');
     expect(result).toBe('First part second part');
   });
 
   it('should handle SDK errors gracefully (network, rate limits, auth)', async () => {
-    mockQuery.mockRejectedValue(new Error('Network error'));
+    mockQuery.mockImplementation(async function* () {
+      throw new Error('Network error');
+    });
 
     await expect(client.execute('Test prompt')).rejects.toThrow('Network error');
   });
 
   it('should ignore non-result message types (status, progress)', async () => {
-    mockQuery.mockResolvedValue([
-      { type: 'status', content: 'Starting...' },
-      { type: 'result', content: 'Actual response' },
-      { type: 'progress', content: '50%' }
-    ]);
+    mockQuery.mockImplementation(async function* () {
+      yield { type: 'status', content: 'Starting...' };
+      yield { type: 'result', result: 'Actual response' };
+      yield { type: 'progress', content: '50%' };
+    });
 
     const result = await client.execute('Test prompt');
     expect(result).toBe('Actual response');
   });
 
   it('should timeout after configurable duration', async () => {
-    mockQuery.mockImplementation(() => new Promise(resolve => setTimeout(resolve, 2000)));
+    mockQuery.mockImplementation(async function* () {
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      yield { type: 'result', result: 'Response' };
+    });
 
     await expect(client.execute('Test prompt', { timeout: 1000 })).rejects.toThrow('timeout');
   });

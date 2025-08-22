@@ -77,7 +77,7 @@ claude-eval evals/developer-suggest-strong-type.yaml
 claude-eval evals/*.yaml
 
 # JSON output
-claude-eval evals/test.yaml --format=json
+claude-eval evals/test.yaml --output-format json
 ```
 
 ## TDD Implementation Phases
@@ -121,7 +121,7 @@ claude-eval evals/test.yaml --format=json
 - Should format console output with colored ✅/❌ indicators
 - Should show overall PASSED/FAILED status
 - Should display summary statistics (X/Y passed)
-- Should produce valid JSON structure for --format=json
+- Should produce valid JSON structure for --output-format json
 - Should handle empty results array
 - Should format batch evaluation results
 
@@ -138,7 +138,7 @@ claude-eval evals/test.yaml --format=json
 
 **test/integration/cli.test.ts**
 - Should execute single evaluation from command line
-- Should support JSON output format via --format flag
+- Should support JSON output format via --output-format flag
 - Should handle missing files with clear error message
 - Should support glob patterns for batch evaluation
 - Should exit with non-zero code on evaluation failure

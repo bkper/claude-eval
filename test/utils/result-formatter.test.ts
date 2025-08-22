@@ -1,3 +1,21 @@
+// Mock chalk
+jest.mock('chalk', () => ({
+  red: (text: string) => text,
+  green: (text: string) => text,
+  blue: (text: string) => text,
+  yellow: (text: string) => text,
+  bold: (text: string) => text,
+  dim: (text: string) => text,
+  default: {
+    red: (text: string) => text,
+    green: (text: string) => text,
+    blue: (text: string) => text,
+    yellow: (text: string) => text,
+    bold: (text: string) => text,
+    dim: (text: string) => text,
+  }
+}));
+
 import { ResultFormatter, EvaluationResult, CriterionResult } from '../../src/utils/result-formatter';
 
 describe('ResultFormatter', () => {
@@ -69,7 +87,7 @@ describe('ResultFormatter', () => {
   });
 
   describe('formatJSON', () => {
-    it('should produce valid JSON structure for --format=json', () => {
+    it('should produce valid JSON structure for --output-format json', () => {
       const result: EvaluationResult = {
         overall: true,
         criteria: [

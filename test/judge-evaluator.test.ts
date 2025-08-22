@@ -1,27 +1,19 @@
-import { JudgeEvaluator, EvaluationResult } from '../src/judge-evaluator';
+import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 
 // Mock the Claude Code SDK
+const mockQuery = jest.fn();
 jest.mock('@anthropic-ai/claude-code', () => ({
-  Client: jest.fn().mockImplementation(() => ({
-    query: jest.fn(),
-  })),
+  query: mockQuery,
 }));
+
+import { JudgeEvaluator } from '../src/judge-evaluator';
 
 describe('JudgeEvaluator', () => {
   let evaluator: JudgeEvaluator;
-  let mockQuery: jest.Mock;
 
   beforeEach(() => {
-    const { Client } = require('@anthropic-ai/claude-code');
-    mockQuery = jest.fn();
-    Client.mockImplementation(() => ({
-      query: mockQuery,
-    }));
-    evaluator = new JudgeEvaluator();
-  });
-
-  afterEach(() => {
     jest.clearAllMocks();
+    evaluator = new JudgeEvaluator();
   });
 
   it('should evaluate all criteria and return structured results', async () => {
@@ -29,9 +21,9 @@ describe('JudgeEvaluator', () => {
 Criterion 1: ✅ PASS - The response recommends TypeScript
 Criterion 2: ❌ FAIL - No tsconfig.json was mentioned
 `;
-    mockQuery.mockResolvedValue([
-      { type: 'result', content: mockJudgeResponse }
-    ]);
+    mockQuery.mockImplementation(async function* () {
+      yield { type: 'result', result: mockJudgeResponse };
+    });
 
     const response = 'Use JavaScript for your project';
     const criteria = [
@@ -52,9 +44,9 @@ Criterion 2: ❌ FAIL - No tsconfig.json was mentioned
 ✅ Criterion 1: PASS
 ❌ Criterion 2: FAIL
 `;
-    mockQuery.mockResolvedValue([
-      { type: 'result', content: mockJudgeResponse }
-    ]);
+    mockQuery.mockImplementation(async function* () {
+      yield { type: 'result', result: mockJudgeResponse };
+    });
 
     const result = await evaluator.evaluate('response', ['criteria1', 'criteria2']);
     
@@ -64,12 +56,12 @@ Criterion 2: ❌ FAIL - No tsconfig.json was mentioned
 
   it('should handle ambiguous or unclear evaluations as failures', async () => {
     const mockJudgeResponse = `
-Criterion 1: Maybe passes
-Criterion 2: Unclear result
+Criterion 1: Somewhat unclear
+Criterion 2: Ambiguous result
 `;
-    mockQuery.mockResolvedValue([
-      { type: 'result', content: mockJudgeResponse }
-    ]);
+    mockQuery.mockImplementation(async function* () {
+      yield { type: 'result', result: mockJudgeResponse };
+    });
 
     const result = await evaluator.evaluate('response', ['criteria1', 'criteria2']);
     
@@ -79,16 +71,16 @@ Criterion 2: Unclear result
   });
 
   it('should construct proper judge prompt with response and criteria', async () => {
-    mockQuery.mockResolvedValue([
-      { type: 'result', content: '✅ All good' }
-    ]);
+    mockQuery.mockImplementation(async function* () {
+      yield { type: 'result', result: '✅ All good' };
+    });
 
     const response = 'Test response';
     const criteria = ['Should work'];
 
     await evaluator.evaluate(response, criteria);
 
-    const calledPrompt = mockQuery.mock.calls[0][0];
+    const calledPrompt = (mockQuery as jest.MockedFunction<any>).mock.calls[0][0].prompt;
     expect(calledPrompt).toContain(response);
     expect(calledPrompt).toContain('Should work');
     expect(calledPrompt).toContain('✅');
@@ -96,9 +88,9 @@ Criterion 2: Unclear result
   });
 
   it('should handle empty responses', async () => {
-    mockQuery.mockResolvedValue([
-      { type: 'result', content: '❌ Empty response fails all criteria' }
-    ]);
+    mockQuery.mockImplementation(async function* () {
+      yield { type: 'result', result: '❌ Empty response fails all criteria' };
+    });
 
     const result = await evaluator.evaluate('', ['Should not be empty']);
     
@@ -106,9 +98,9 @@ Criterion 2: Unclear result
   });
 
   it('should handle malformed judge responses gracefully', async () => {
-    mockQuery.mockResolvedValue([
-      { type: 'result', content: 'Completely malformed response with no indicators' }
-    ]);
+    mockQuery.mockImplementation(async function* () {
+      yield { type: 'result', result: 'Completely malformed response with no indicators' };
+    });
 
     const result = await evaluator.evaluate('response', ['criteria']);
     

@@ -38,7 +38,7 @@ npx claude-eval evals/*.yaml
 npx claude-eval evals/*.yaml --concurrency=3
 
 # JSON output
-npx claude-eval evals/simple-hello-world.yaml --format=json
+npx claude-eval evals/simple-hello-world.yaml --output-format json
 ```
 
 ## Evaluation File Format
