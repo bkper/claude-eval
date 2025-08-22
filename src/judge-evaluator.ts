@@ -1,0 +1,90 @@
+import { query } from '@anthropic-ai/claude-code';
+import type { EvaluationResult, CriterionResult } from './utils/result-formatter.js';
+
+export type { EvaluationResult, CriterionResult };
+
+export class JudgeEvaluator {
+  async evaluate(response: string, criteria: string[]): Promise<EvaluationResult> {
+    const judgePrompt = this.constructJudgePrompt(response, criteria);
+    
+    try {
+      const messages = [];
+      for await (const message of query({ prompt: judgePrompt, options: { permissionMode: 'plan' } })) {
+        messages.push(message);
+      }
+      const judgeResponse = messages
+        .filter((msg: any) => msg.type === 'result')
+        .map((msg: any) => msg.result)
+        .join('');
+      
+      const evaluatedCriteria = this.parseJudgeResponse(judgeResponse, criteria);
+      const overall = evaluatedCriteria.every(c => c.passed);
+      
+      return {
+        overall,
+        criteria: evaluatedCriteria
+      };
+    } catch (error) {
+      // If evaluation fails, mark all criteria as failed
+      const failedCriteria = criteria.map(criterion => ({
+        criterion,
+        passed: false,
+        reason: 'Evaluation error'
+      }));
+      
+      return {
+        overall: false,
+        criteria: failedCriteria
+      };
+    }
+  }
+  
+  private constructJudgePrompt(response: string, criteria: string[]): string {
+    return `You are an evaluation judge. Evaluate the following response against the given criteria.
+
+Response to evaluate:
+${response}
+
+Criteria to evaluate against:
+${criteria.map((c, i) => `${i + 1}. ${c}`).join('\n')}
+
+For each criterion, respond with either:
+- ✅ [Brief reason why it passes]
+- ❌ [Brief reason why it fails]
+
+Format your response clearly with one line per criterion.`;
+  }
+  
+  private parseJudgeResponse(judgeResponse: string, criteria: string[]): CriterionResult[] {
+    const lines = judgeResponse.split('\n').filter(line => line.trim());
+    
+    return criteria.map((criterion, index) => {
+      // Look for ✅ or ❌ indicators in the judge response
+      const relevantLines = lines.filter(line => 
+        line.includes('✅') || line.includes('❌') || 
+        line.toLowerCase().includes('pass') || line.toLowerCase().includes('fail')
+      );
+      
+      // Try to find a line that corresponds to this criterion
+      let passed = false;
+      let reason = 'No clear evaluation found';
+      
+      if (relevantLines.length > index) {
+        const line = relevantLines[index];
+        if (line.includes('✅') || line.toLowerCase().includes('pass')) {
+          passed = true;
+          reason = line.replace(/✅/g, '').trim();
+        } else if (line.includes('❌') || line.toLowerCase().includes('fail')) {
+          passed = false;
+          reason = line.replace(/❌/g, '').trim();
+        }
+      }
+      
+      return {
+        criterion,
+        passed,
+        reason
+      };
+    });
+  }
+}

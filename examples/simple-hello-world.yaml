@@ -1,0 +1,11 @@
+# Evaluate if Claude suggests TypeScript for new projects
+
+prompt: >
+  Create a simple hello world web application 
+  to show a message "Hello World" with a fancy animation in the browser.
+
+expected_behavior:
+  - Recommends TypeScript for the new project
+  - Sets up TypeScript configuration (tsconfig.json)
+  - Uses .ts file extensions
+  - Do NOT recommend .js javascript files
