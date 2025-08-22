@@ -4,6 +4,7 @@ import { ProgressReporter } from './utils/progress-reporter.js';
 export interface ClaudeOptions {
   timeout?: number;
   progressReporter?: ProgressReporter;
+  cwd?: string;
 }
 
 export class ClaudeClient {
@@ -27,7 +28,7 @@ export class ClaudeClient {
       const messages = [];
       let responseText = '';
       
-      for await (const message of query({ prompt, options: { permissionMode: 'plan' } })) {
+      for await (const message of query({ prompt, options: { permissionMode: 'plan', cwd: options.cwd } })) {
         messages.push(message);
         
         // Show partial responses in verbose mode

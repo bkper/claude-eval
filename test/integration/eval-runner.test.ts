@@ -276,7 +276,10 @@ expected_behavior:
     // Check Claude call
     expect(mockQuery).toHaveBeenNthCalledWith(1, {
       prompt: 'Create a hello world function - give the most detailed plan possible',
-      options: { permissionMode: 'plan' }
+      options: { 
+        permissionMode: 'plan',
+        cwd: expect.stringContaining('test/temp')
+      }
     });
 
     // Check Judge call

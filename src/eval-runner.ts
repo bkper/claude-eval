@@ -1,4 +1,5 @@
 import * as fs from 'fs/promises';
+import * as path from 'path';
 import pLimit from 'p-limit';
 import { parseEvalSpec } from './utils/yaml-parser.js';
 import { ClaudeClient } from './claude-client.js';
@@ -36,9 +37,13 @@ export class EvalRunner {
         progressReporter.debug(`Found ${evalSpec.expected_behavior.length} criteria to evaluate`);
       }
       
+      // Extract directory from eval file path to use as working directory
+      const evalFileDir = path.dirname(path.resolve(filePath));
+      
       // Execute prompt with Claude
       const response = await this.claudeClient.execute(evalSpec.prompt, { 
-        progressReporter 
+        progressReporter,
+        cwd: evalFileDir
       });
       
       // Evaluate response with judge
