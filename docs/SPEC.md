@@ -1,4 +1,4 @@
-# claude-code-eval - Evaluation System for Claude Code Agent
+# claude-eval - Evaluation System for Claude Code Agent
 
 ## Executive Summary
 A Test-Driven Development (TDD) approach to build a Node.js CLI application that evaluates AI agent responses using Claude Code SDK and LLM-as-a-judge methodology. The system will test whether changes to bkper-os context definitions improve or degrade response quality.
@@ -11,10 +11,10 @@ A Test-Driven Development (TDD) approach to build a Node.js CLI application that
 
 ## Architecture
 
-### 1. CLI Interface (`bin/claude-code-eval.ts`)
+### 1. CLI Interface (`bin/claude-eval.ts`)
 ```bash
 # Run evaluation - SDK handles context automatically
-claude-code-eval evals/developer-suggest-strong-type.yaml
+claude-eval evals/developer-suggest-strong-type.yaml
 ```
 
 ### 2. Core Components
@@ -38,10 +38,10 @@ claude-code-eval evals/developer-suggest-strong-type.yaml
 
 ### 3. File Structure
 ```
-claude-code-eval/
+claude-eval/
 ├── package.json
 ├── bin/
-│   └── claude-code-eval.ts       # CLI entry point
+│   └── claude-eval.ts       # CLI entry point
 └── src/
     ├── eval-runner.ts            # Main orchestrator
     ├── claude-client.ts          # Claude SDK wrapper
@@ -71,13 +71,13 @@ claude-code-eval/
 ## Usage
 ```bash
 # Single evaluation
-cc-eval evals/developer-suggest-strong-type.yaml
+claude-eval evals/developer-suggest-strong-type.yaml
 
 # Multiple evaluations
-cc-eval evals/*.yaml
+claude-eval evals/*.yaml
 
 # JSON output
-cc-eval evals/test.yaml --format=json
+claude-eval evals/test.yaml --format=json
 ```
 
 ## TDD Implementation Phases

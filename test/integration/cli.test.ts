@@ -6,7 +6,7 @@ import * as fs from 'fs/promises';
 jest.mock('fs/promises');
 
 describe('CLI Integration', () => {
-  const cliPath = path.join(__dirname, '../../bin/claude-code-eval.ts');
+  const cliPath = path.join(__dirname, '../../bin/claude-eval.ts');
   
   const runCLI = (args: string[]): Promise<{ stdout: string; stderr: string; exitCode: number }> => {
     return new Promise((resolve) => {
@@ -143,7 +143,7 @@ expected_behavior:
     const result = await runCLI(['--help']);
     
     expect(result.exitCode).toBe(0);
-    expect(result.stdout).toContain('claude-code-eval');
+    expect(result.stdout).toContain('claude-eval');
     expect(result.stdout).toContain('Usage:');
     expect(result.stdout).toContain('--format');
   });

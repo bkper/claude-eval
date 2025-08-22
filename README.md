@@ -1,4 +1,4 @@
-# claude-code-eval
+# claude-eval
 
 An evaluation system for AI agent responses using LLM-as-a-judge methodology. This tool helps test and validate Claude Code SDK responses against defined criteria.
 
@@ -13,25 +13,25 @@ bun install
 ### Single Evaluation
 
 ```bash
-bun run claude-code-eval evals/developer-suggest-strong-type.yaml
+bun run claude-eval evals/developer-suggest-strong-type.yaml
 ```
 
 ### Multiple Evaluations (Batch)
 
 ```bash
-bun run claude-code-eval evals/*.yaml
+bun run claude-eval evals/*.yaml
 ```
 
 ### JSON Output
 
 ```bash
-bun run claude-code-eval evals/test.yaml --format=json
+bun run claude-eval evals/test.yaml --format=json
 ```
 
 ### Custom Concurrency
 
 ```bash
-bun run claude-code-eval evals/*.yaml --concurrency=3
+bun run claude-eval evals/*.yaml --concurrency=3
 ```
 
 ## Evaluation File Format

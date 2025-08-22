@@ -1,18 +1,18 @@
 {
-  "name": "claude-code-eval",
+  "name": "claude-eval",
   "version": "1.0.0",
   "description": "Evaluation system for AI agent responses using LLM-as-a-judge methodology",
   "type": "module",
   "private": true,
   "bin": {
-    "claude-code-eval": "./bin/claude-code-eval.ts"
+    "claude-eval": "./bin/claude-eval.ts"
   },
   "scripts": {
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "build": "tsc",
-    "dev": "bun run bin/claude-code-eval.ts"
+    "dev": "bun run bin/claude-eval.ts"
   },
   "devDependencies": {
     "@types/bun": "latest",

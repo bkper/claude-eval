@@ -8,7 +8,7 @@ import { ResultFormatter } from '../src/utils/result-formatter.js';
 const program = new Command();
 
 program
-  .name('claude-code-eval')
+  .name('claude-eval')
   .description('Evaluation system for AI agent responses using LLM-as-a-judge methodology')
   .version('1.0.0')
   .argument('<files...>', 'YAML evaluation files or glob patterns')
