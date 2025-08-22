@@ -1,9 +1,9 @@
 import { query } from '@anthropic-ai/claude-code';
-import { ProgressReporter } from './utils/progress-reporter.js';
+import { IProgressReporter } from './utils/progress-reporter-interface.js';
 
 export interface ClaudeOptions {
   timeout?: number;
-  progressReporter?: ProgressReporter;
+  progressReporter?: IProgressReporter;
   cwd?: string;
 }
 

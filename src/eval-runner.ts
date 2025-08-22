@@ -6,10 +6,14 @@ import { ClaudeClient } from './claude-client.js';
 import { JudgeEvaluator } from './judge-evaluator.js';
 import { EvaluationResult, BatchResult } from './utils/result-formatter.js';
 import { ProgressReporter } from './utils/progress-reporter.js';
+import { TerminalProgressManager } from './utils/terminal-progress-manager.js';
+import { RegionalProgressReporter } from './utils/regional-progress-reporter.js';
+import { IProgressReporter } from './utils/progress-reporter-interface.js';
 
 export interface RunnerOptions {
   concurrency?: number;
   progressReporter?: ProgressReporter;
+  terminalProgressManager?: TerminalProgressManager;
 }
 
 export class EvalRunner {
@@ -21,7 +25,7 @@ export class EvalRunner {
     this.judgeEvaluator = new JudgeEvaluator();
   }
   
-  async runSingle(filePath: string, progressReporter?: ProgressReporter): Promise<EvaluationResult> {
+  async runSingle(filePath: string, progressReporter?: IProgressReporter): Promise<EvaluationResult> {
     const startTime = Date.now();
     
     try {
@@ -67,27 +71,42 @@ export class EvalRunner {
   
   async runBatch(filePaths: string[], options: RunnerOptions = {}): Promise<BatchResult[]> {
     const concurrency = options.concurrency || 5;
-    const progressReporter = options.progressReporter;
-    const batchStartTime = Date.now();
+    const terminalProgressManager = options.terminalProgressManager;
     
-    if (progressReporter) {
-      progressReporter.startBatch(filePaths.length);
-      progressReporter.debug(`Using concurrency limit of ${concurrency}`);
+    // Start the batch with the terminal progress manager
+    if (terminalProgressManager) {
+      terminalProgressManager.startBatch(filePaths.length);
+      terminalProgressManager.debug(`Using concurrency limit of ${concurrency}`);
     }
     
     const limit = pLimit(concurrency);
     
-    const promises = filePaths.map(filePath => 
+    const promises = filePaths.map((filePath, index) => 
       limit(async () => {
+        // Create a unique region ID for this evaluation
+        const regionId = `eval_${index}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        
         try {
-          const result = await this.runSingle(filePath, progressReporter);
+          // Create a regional progress reporter for this evaluation
+          const regionalReporter = terminalProgressManager?.createRegionalReporter(regionId, index + 1);
+          
+          // Run the evaluation with the regional reporter
+          const result = await this.runSingle(filePath, regionalReporter);
+          
+          // Mark the region as completed
+          if (terminalProgressManager) {
+            terminalProgressManager.markRegionCompleted(regionId, result.overall);
+          }
+          
           return { file: filePath, result };
         } catch (error) {
           // Return failed result for individual file errors
           const errorMessage = error instanceof Error ? error.message : 'Unknown error';
           
-          if (progressReporter) {
-            progressReporter.error(`Failed to process ${filePath}: ${errorMessage}`);
+          // Mark region as failed and show error
+          if (terminalProgressManager) {
+            terminalProgressManager.error(`Failed to process ${filePath}: ${errorMessage}`);
+            terminalProgressManager.markRegionCompleted(regionId, false);
           }
           
           return {
@@ -106,12 +125,6 @@ export class EvalRunner {
     );
     
     const results = await Promise.all(promises);
-    
-    if (progressReporter) {
-      const batchDuration = Date.now() - batchStartTime;
-      const passedCount = results.filter(r => r.result.overall).length;
-      progressReporter.batchCompleted(passedCount, results.length, batchDuration);
-    }
     
     return results;
   }

@@ -1,11 +1,11 @@
 import { query } from '@anthropic-ai/claude-code';
 import type { EvaluationResult, CriterionResult } from './utils/result-formatter.js';
-import { ProgressReporter } from './utils/progress-reporter.js';
+import { IProgressReporter } from './utils/progress-reporter-interface.js';
 
 export type { EvaluationResult, CriterionResult };
 
 export class JudgeEvaluator {
-  async evaluate(response: string, criteria: string[], progressReporter?: ProgressReporter): Promise<EvaluationResult> {
+  async evaluate(response: string, criteria: string[], progressReporter?: IProgressReporter): Promise<EvaluationResult> {
     const startTime = Date.now();
     
     if (progressReporter) {

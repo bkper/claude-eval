@@ -5,6 +5,7 @@ import { glob } from 'glob';
 import { EvalRunner } from '../src/eval-runner.js';
 import { ResultFormatter } from '../src/utils/result-formatter.js';
 import { ProgressReporter, type ProgressLevel } from '../src/utils/progress-reporter.js';
+import { TerminalProgressManager } from '../src/utils/terminal-progress-manager.js';
 
 const program = new Command();
 
@@ -64,17 +65,23 @@ program
           process.exit(1);
         }
       } else {
-        // Batch evaluation
+        // Batch evaluation - use TerminalProgressManager for coordinated output
         const concurrency = parseInt(options.concurrency, 10);
+        const terminalProgressManager = new TerminalProgressManager(progressLevel);
+        
         const batchResults = await runner.runBatch(expandedFiles, { 
           concurrency, 
-          progressReporter 
+          terminalProgressManager 
         });
         
         if (options.format === 'json') {
           console.log(JSON.stringify(batchResults, null, 2));
         } else {
-          console.log(formatter.formatBatchResults(batchResults));
+          // For console format, the TerminalProgressManager already showed detailed output
+          // Only show summary if it was quiet mode
+          if (progressLevel === 'quiet') {
+            console.log(formatter.formatBatchResults(batchResults));
+          }
         }
         
         // Exit with non-zero code if any evaluation failed

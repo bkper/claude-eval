@@ -1,4 +1,5 @@
 import chalk from 'chalk';
+import { IProgressReporter } from './progress-reporter-interface.js';
 
 export type ProgressLevel = 'quiet' | 'normal' | 'verbose';
 
@@ -6,7 +7,7 @@ export interface ProgressOptions {
   level: ProgressLevel;
 }
 
-export class ProgressReporter {
+export class ProgressReporter implements IProgressReporter {
   private level: ProgressLevel;
   private currentBatchIndex: number = 0;
   private totalBatchCount: number = 0;
