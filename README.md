@@ -18,20 +18,8 @@ This tool solves those problems by enabling Eval-driven development for Claude C
 
 No complex scoring or ranking — just clear PASSED ✅ / FAILED ❌ results for your evaluation criteria.
 
-It's like TDD for your Claude Code setup.
+It's like TDD for AI.
 
-## Installation
-
-### Quick Start (Recommended)
-No installation required. Run directly with npm or bun:
-
-```bash
-# Using npm
-npx claude-eval evals/your-eval.yaml
-
-# Using bun  
-bunx claude-eval evals/your-eval.yaml
-```
 
 ### Prerequisites
 - Node.js 18+ or Bun
@@ -76,8 +64,8 @@ expected_behavior:
 ## How It Works
 
 1. **Parse YAML**: Loads and validates the evaluation specification
-2. **Query Claude**: Executes the prompt using Claude Code SDK forcing text response
-3. **Judge Response**: Uses simplified LLM-as-a-judge to evaluate the response against each criteria
+2. **Query Claude**: Executes the prompt on  Sonnet model, forcing text response
+3. **Judge Response**: Uses simplified LLM-as-a-judge with Haiku model, to evaluate the response against each criteria
 4. **Format Results**: Displays results with ✅/❌ indicators and summary
 
 ## Contributing
@@ -92,11 +80,4 @@ We welcome contributions! Please:
 
 For bug reports and feature requests, please use the [GitHub Issues](https://github.com/bkper/claude-eval/issues) page.
 
-## Limitations & Known Issues
-
-- **Claude Code dependency**: Requires Claude Code to be properly configured
-- **Text responses only**: Currently forces text-only responses from Claude
-- **Single model evaluation**: Uses one Claude model for both response generation and judging
-- **English language**: Evaluation criteria and judging work best in English
-- **Simple pass/fail**: No nuanced scoring or partial credit system
 
