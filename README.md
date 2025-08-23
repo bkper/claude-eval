@@ -39,9 +39,6 @@ npx claude-eval evals/*.yaml
 
 # Custom concurrency
 npx claude-eval evals/*.yaml --concurrency=3
-
-# JSON output
-npx claude-eval evals/say-dont-know-clear-way.yaml --output-format json
 ```
 
 ## Evaluation File Format

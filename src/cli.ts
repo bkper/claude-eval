@@ -14,11 +14,10 @@ program
   .description('Evaluation system for AI agent responses using LLM-as-a-judge methodology')
   .version('1.0.0')
   .argument('<files...>', 'YAML evaluation files or glob patterns')
-  .option('--format <format>', 'Output format (console|json)', 'console')
   .option('--concurrency <number>', 'Number of concurrent evaluations', '5')
   .option('--verbose', 'Show detailed progress including partial responses')
   .option('--quiet', 'Suppress progress output')
-  .action(async (files: string[], options: { format: string; concurrency: string; verbose?: boolean; quiet?: boolean }) => {
+  .action(async (files: string[], options: { concurrency: string; verbose?: boolean; quiet?: boolean }) => {
     try {
       const runner = new EvalRunner();
       const formatter = new ResultFormatter();
@@ -54,10 +53,7 @@ program
         // Single evaluation
         const result = await runner.runSingle(expandedFiles[0], progressReporter);
         
-        if (options.format === 'json') {
-          console.log(formatter.formatJSON(result));
-        }
-        // For console format, the progress reporter already shows the detailed output
+        // The progress reporter already shows the detailed output
         
         // Script completed successfully - evaluation results already reported
         process.exit(0);
@@ -71,14 +67,10 @@ program
           terminalProgressManager 
         });
         
-        if (options.format === 'json') {
-          console.log(JSON.stringify(batchResults, null, 2));
-        } else {
-          // For console format, the TerminalProgressManager already showed detailed output
-          // Only show summary if it was quiet mode
-          if (progressLevel === 'quiet') {
-            console.log(formatter.formatBatchResults(batchResults));
-          }
+        // For console format, the TerminalProgressManager already showed detailed output
+        // Only show summary if it was quiet mode
+        if (progressLevel === 'quiet') {
+          console.log(formatter.formatBatchResults(batchResults));
         }
         
         // Script completed successfully - evaluation results already reported

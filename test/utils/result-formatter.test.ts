@@ -86,25 +86,6 @@ describe('ResultFormatter', () => {
     });
   });
 
-  describe('formatJSON', () => {
-    it('should produce valid JSON structure for --output-format json', () => {
-      const result: EvaluationResult = {
-        overall: true,
-        criteria: [
-          { criterion: 'Should work', passed: true, reason: 'It works' }
-        ]
-      };
-
-      const jsonOutput = formatter.formatJSON(result);
-      const parsed = JSON.parse(jsonOutput);
-
-      expect(parsed.overall).toBe(true);
-      expect(parsed.criteria).toHaveLength(1);
-      expect(parsed.criteria[0].criterion).toBe('Should work');
-      expect(parsed.criteria[0].passed).toBe(true);
-    });
-  });
-
   describe('formatBatchResults', () => {
     it('should format batch evaluation results', () => {
       const batchResults = [

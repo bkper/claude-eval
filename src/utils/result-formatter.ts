@@ -44,10 +44,6 @@ export class ResultFormatter {
     return lines.join('\n');
   }
   
-  formatJSON(result: EvaluationResult): string {
-    return JSON.stringify(result, null, 2);
-  }
-  
   formatBatchResults(batchResults: BatchResult[]): string {
     const lines: string[] = [];
     
