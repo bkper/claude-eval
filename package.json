@@ -1,6 +1,6 @@
 {
   "name": "claude-eval",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Simple evaluation tool for Claude Code AI agent responses using LLM-as-a-judge methodology.",
   "type": "module",
   "main": "./dist/index.js",
