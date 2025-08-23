@@ -4,7 +4,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/Node.js-18%2B-green.svg)](https://nodejs.org/)
 
-An evaluation tool for Claude Code using a [LLM-as-a-judge](https://towardsdatascience.com/llm-as-a-judge-a-practical-guide/) simplified approach. 
+An evaluation tool for [Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview) using a [LLM-as-a-judge](https://towardsdatascience.com/llm-as-a-judge-a-practical-guide/) simplified approach. 
 
 Problems faced when changing Claude Code contexts and models:
 
@@ -36,7 +36,7 @@ bunx claude-eval evals/your-eval.yaml
 ### Prerequisites
 - Node.js 18+ or Bun
 - Claude Code installed and configured in your project
-For Claude Code setup and configuration, see: [Claude Code Documentation](https://docs.anthropic.com/claude-code)
+For Claude Code setup and configuration, see: [Claude Code Documentation](https://docs.anthropic.com/en/docs/claude-code/overview)
 
 
 ## Usage
