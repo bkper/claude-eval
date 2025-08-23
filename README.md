@@ -1,4 +1,4 @@
-# claude-eval
+# claude-code-eval
 
 An evaluation tool for Claude Code using a [LLM-as-a-judge](https://towardsdatascience.com/llm-as-a-judge-a-practical-guide/) simplified approach. 
 
