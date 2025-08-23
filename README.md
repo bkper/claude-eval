@@ -6,11 +6,11 @@
 
 An evaluation tool for [Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview) using a [LLM-as-a-judge](https://towardsdatascience.com/llm-as-a-judge-a-practical-guide/) simplified approach. 
 
-Problems faced when changing Claude Code contexts and models:
+When changing Claude Code contexts and models:
 
-- How can you know if the change is working as expected?
-- How can you know it was a good or bad change?
-- How can you know if the change is NOT breaking something else?
+- How can you know if the change work as expected?
+- How can you know it was a good or a bad change?
+- How can you know if the change will NOT break something else?
 
 This tool solves those problems by enabling Eval-driven development for Claude Code. 
 
@@ -23,8 +23,7 @@ It's like TDD for AI.
 
 ### Prerequisites
 - Node.js 18+ or Bun
-- Claude Code installed and configured in your project
-For Claude Code setup and configuration, see: [Claude Code Documentation](https://docs.anthropic.com/en/docs/claude-code/overview)
+- Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview) installed and configured in your project
 
 
 ## Usage
@@ -46,8 +45,6 @@ Evaluation files are YAML documents with the following structure:
 
 ```yaml
 
-# Evaluate if Claude just says it doesn't know the answer clearly
-
 prompt: >
   What is the weather for today?
 
@@ -64,8 +61,8 @@ expected_behavior:
 ## How It Works
 
 1. **Parse YAML**: Loads and validates the evaluation specification
-2. **Query Claude**: Executes the prompt on  Sonnet model, forcing text response
-3. **Judge Response**: Uses simplified LLM-as-a-judge with Haiku model, to evaluate the response against each criteria
+2. **Query Claude**: Executes the prompt on **Sonnet** model, forcing text response
+3. **Judge Response**: Uses simplified LLM-as-a-judge with **Haiku** model, to evaluate the response against each criteria
 4. **Format Results**: Displays results with ✅/❌ indicators and summary
 
 ## Contributing
