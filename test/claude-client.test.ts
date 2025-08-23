@@ -24,12 +24,12 @@ describe('ClaudeClient', () => {
 
     const result = await client.execute('Test prompt');
     expect(result).toBe(mockResponse);
-    const expectedPrompt = `Please respond to the following prompt with text only. Do not use any tools, create/modify/delete files, or execute commands. Just provide a direct text response.
+    const expectedPrompt = `Respond to the following prompt with text only. Do NOT use any tools, create/modify/delete files, or execute commands. Just provide a direct text response.
 
 User prompt: Test prompt
 
-Remember: Text response only, no file operations or tool usage.`;
-    expect(mockQuery).toHaveBeenCalledWith({ prompt: expectedPrompt, options: { permissionMode: 'default' } });
+REMEMBER: Text response only, no file operations or tool usage.`;
+    expect(mockQuery).toHaveBeenCalledWith({ prompt: expectedPrompt, options: { permissionMode: 'default', cwd: undefined, model: 'sonnet' } });
   });
 
   it('should pass permissionMode: default option to SDK', async () => {
@@ -38,12 +38,12 @@ Remember: Text response only, no file operations or tool usage.`;
     });
 
     await client.execute('Test prompt');
-    const expectedPrompt = `Please respond to the following prompt with text only. Do not use any tools, create/modify/delete files, or execute commands. Just provide a direct text response.
+    const expectedPrompt = `Respond to the following prompt with text only. Do NOT use any tools, create/modify/delete files, or execute commands. Just provide a direct text response.
 
 User prompt: Test prompt
 
-Remember: Text response only, no file operations or tool usage.`;
-    expect(mockQuery).toHaveBeenCalledWith({ prompt: expectedPrompt, options: { permissionMode: 'default' } });
+REMEMBER: Text response only, no file operations or tool usage.`;
+    expect(mockQuery).toHaveBeenCalledWith({ prompt: expectedPrompt, options: { permissionMode: 'default', cwd: undefined, model: 'sonnet' } });
   });
 
   it('should handle multiple message chunks and concatenate them', async () => {

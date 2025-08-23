@@ -274,16 +274,17 @@ expected_behavior:
     await runner.runSingle(testFile);
 
     // Check Claude call
-    const expectedPrompt = `Please respond to the following prompt with text only. Do not use any tools, create/modify/delete files, or execute commands. Just provide a direct text response.
+    const expectedPrompt = `Respond to the following prompt with text only. Do NOT use any tools, create/modify/delete files, or execute commands. Just provide a direct text response.
 
 User prompt: Create a hello world function
 
-Remember: Text response only, no file operations or tool usage.`;
+REMEMBER: Text response only, no file operations or tool usage.`;
     expect(mockQuery).toHaveBeenNthCalledWith(1, {
       prompt: expectedPrompt,
       options: { 
         permissionMode: 'default',
-        cwd: expect.stringContaining('test/temp')
+        cwd: expect.stringContaining('test/temp'),
+        model: 'sonnet'
       }
     });
 
