@@ -17,7 +17,7 @@
     "test:coverage": "jest --coverage",
     "build": "tsc",
     "clean": "rm -rf dist",
-    "prepublishOnly": "npm run clean && npm run build",
+    "prepublishOnly": "bun run clean && bun run build",
     "dev": "tsc --watch --preserveWatchOutput",
     "dev:run": "node dist/cli.js"
   },
