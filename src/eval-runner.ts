@@ -83,7 +83,7 @@ export class EvalRunner {
     
     // Start the batch with the terminal progress manager
     if (terminalProgressManager) {
-      terminalProgressManager.startBatch(filePaths.length);
+      terminalProgressManager.startBatch(filePaths.length, concurrency);
       terminalProgressManager.debug(`Using concurrency limit of ${concurrency}`);
     }
     

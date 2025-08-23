@@ -18,16 +18,18 @@ export class ProgressReporter implements IProgressReporter {
     this.level = options.level;
   }
 
-  startBatch(totalCount: number): void {
+  startBatch(totalCount: number, concurrency: number = 5): void {
     if (this.level === 'quiet') return;
     
     this.totalBatchCount = totalCount;
     this.currentBatchIndex = 0;
     
-    if (totalCount === 1) {
-      console.log(chalk.blue('🚀 Running evaluation...'));
+    const actualRunning = Math.min(concurrency, totalCount);
+    
+    if (actualRunning === 1) {
+      console.log(chalk.blue('🚀 Running 1 evaluation'));
     } else {
-      console.log(chalk.blue(`🚀 Running ${totalCount} evaluations...`));
+      console.log(chalk.blue(`🚀 Running ${actualRunning} evaluations`));
     }
   }
 

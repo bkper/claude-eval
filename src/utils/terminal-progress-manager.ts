@@ -17,24 +17,28 @@ export class TerminalProgressManager {
   private batchStartTime: number = 0;
   private progressIndicator: SimpleProgressIndicator;
   private isShowingProgress: boolean = false;
+  private concurrency: number = 5;
 
   constructor(level: ProgressLevel = 'normal') {
     this.level = level;
     this.progressIndicator = new SimpleProgressIndicator();
   }
 
-  startBatch(totalCount: number): void {
+  startBatch(totalCount: number, concurrency: number = 5): void {
     if (this.level === 'quiet') return;
     
     this.totalEvaluations = totalCount;
     this.completedCount = 0;
     this.batchStartTime = Date.now();
+    this.concurrency = concurrency;
     this.regions.clear();
     
-    if (totalCount === 1) {
-      console.log(TerminalFormatter.formatHeader('Running evaluation...', 'main'));
+    const actualRunning = Math.min(concurrency, totalCount);
+    
+    if (actualRunning === 1) {
+      console.log(TerminalFormatter.formatHeader('Running 1 evaluation', 'main'));
     } else {
-      console.log(TerminalFormatter.formatHeader(`Running ${totalCount} evaluations...`, 'main'));
+      console.log(TerminalFormatter.formatHeader(`Running ${actualRunning} evaluations`, 'main'));
       
       // Start progress indicator for multiple evaluations
       this.isShowingProgress = true;
@@ -86,7 +90,8 @@ export class TerminalProgressManager {
     if (!this.isShowingProgress) return;
     
     const remaining = this.totalEvaluations - this.completedCount;
-    const message = `Running ${remaining} evaluation${remaining !== 1 ? 's' : ''} in parallel...`;
+    const actualRunning = Math.min(this.concurrency, remaining);
+    const message = `Running ${actualRunning} evaluation${actualRunning !== 1 ? 's' : ''}`;
     this.progressIndicator.update(message);
   }
 
