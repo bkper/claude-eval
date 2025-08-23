@@ -1,21 +1,18 @@
 # claude-eval
 
-Simple evaluation tool for Claude Code AI agent responses using LLM-as-a-judge methodology. 
+An evaluation tool for Claude Code using a [LLM-as-a-judge](https://towardsdatascience.com/llm-as-a-judge-a-practical-guide/) simplified approach. 
 
-Problems faced when changing Claude Code contexts:
+Problems faced when changing Claude Code contexts and models:
 
 - How can you know if the change is working as expected?
 - How can you know it was a good or bad change?
-- How can you know if the change is breaking something for other team members?
-- As the SONNET-next, OPUS-next, etc. models released, how can you know if the current setup is still working as expected?
+- How can you know if the change is NOT breaking something else?
 
+This tool solve those problems by enabling Eval-driven development for Claude Code. 
 
+![Claude Code Eval Demo](imgs/claude-code-eval.gif)
 
-
-
-Built on Claude SDK, this tool enables eval-driven development for Claude Code agents. 
-
-Test responses against defined criteria to ensure consistent, reliable AI behavior across your team and model updates.
+It's like TDD for your Claude Code agent.
 
 ## Usage
 
@@ -23,17 +20,17 @@ No installation required. Run directly with npm or bun:
 
 ```bash
 # Using npm
-npx claude-eval evals/simple-hello-world.yaml
+npx claude-eval evals/enforce-ts-on-hello-world-app.yaml
 
 # Using bun  
-bunx claude-eval evals/simple-hello-world.yaml
+bunx claude-eval evals/enforce-ts-on-hello-world-app.yaml
 ```
 
 ### Examples
 
 ```bash
 # Single evaluation
-npx claude-eval evals/simple-hello-world.yaml
+npx claude-eval evals/enforce-ts-on-hello-world-app.yaml
 
 # Multiple evaluations (batch)
 npx claude-eval evals/*.yaml
@@ -42,7 +39,7 @@ npx claude-eval evals/*.yaml
 npx claude-eval evals/*.yaml --concurrency=3
 
 # JSON output
-npx claude-eval evals/simple-hello-world.yaml --output-format json
+npx claude-eval evals/enforce-ts-on-hello-world-app.yaml --output-format json
 ```
 
 ## Evaluation File Format
@@ -64,10 +61,6 @@ expected_behavior:
   - Do NOT recommend .js javascript files
 
 ```
-
-## Configuration
-
-**Required:**
 - `prompt`: The prompt to send to Claude Code SDK (in plan mode)
 - `expected_behavior`: Array of criteria that the response should meet
 
