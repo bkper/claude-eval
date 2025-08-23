@@ -14,7 +14,7 @@ This tool solves those problems by enabling Eval-driven development for Claude C
 
 No complex scoring or ranking — just clear PASSED ✅ / FAILED ❌ results for your evaluation criteria.
 
-It's like TDD for your Claude Code agent.
+It's like TDD for your Claude Code setup.
 
 ## Usage
 
@@ -22,17 +22,17 @@ No installation required. Run directly with npm or bun:
 
 ```bash
 # Using npm
-npx claude-eval evals/enforce-ts-on-hello-world-app.yaml
+npx claude-eval evals/say-dont-know-clear-way.yaml
 
 # Using bun  
-bunx claude-eval evals/enforce-ts-on-hello-world-app.yaml
+bunx claude-eval evals/say-dont-know-clear-way.yaml
 ```
 
 ### Examples
 
 ```bash
 # Single evaluation
-npx claude-eval evals/enforce-ts-on-hello-world-app.yaml
+npx claude-eval evals/say-dont-know-clear-way.yaml
 
 # Multiple evaluations (batch)
 npx claude-eval evals/*.yaml
@@ -41,7 +41,7 @@ npx claude-eval evals/*.yaml
 npx claude-eval evals/*.yaml --concurrency=3
 
 # JSON output
-npx claude-eval evals/enforce-ts-on-hello-world-app.yaml --output-format json
+npx claude-eval evals/say-dont-know-clear-way.yaml --output-format json
 ```
 
 ## Evaluation File Format
@@ -50,20 +50,18 @@ Evaluation files are YAML documents with the following structure:
 
 ```yaml
 
-# Evaluate if Claude suggests TypeScript for new projects
+# Evaluate if Claude just says it doesn't know the answer clearly
 
 prompt: >
-  Create a simple hello world web application 
-  to show a message "Hello World" in the browser.
+  What is the weather for today?
 
 expected_behavior:
-  - Recommends TypeScript for the new project
-  - Sets up TypeScript configuration (tsconfig.json)
-  - Uses .ts file extensions
-  - Do NOT recommend .js javascript files
+  - Just say you don't know in a clear way.
+  - Don't give user alternatives.
+  - Don't recommend user to research for the answer elsewhere.
 
 ```
-- `prompt`: The prompt to send to Claude Code SDK (in plan mode)
+- `prompt`: The prompt you would send to Claude Code
 - `expected_behavior`: Array of criteria that the response should meet
 
 ## How It Works
