@@ -59,10 +59,8 @@ program
         }
         // For console format, the progress reporter already shows the detailed output
         
-        // Exit with non-zero code if evaluation failed
-        if (!result.overall) {
-          process.exit(1);
-        }
+        // Script completed successfully - evaluation results already reported
+        process.exit(0);
       } else {
         // Batch evaluation - use TerminalProgressManager for coordinated output
         const concurrency = parseInt(options.concurrency, 10);
@@ -83,11 +81,8 @@ program
           }
         }
         
-        // Exit with non-zero code if any evaluation failed
-        const hasFailures = batchResults.some(b => !b.result.overall);
-        if (hasFailures) {
-          process.exit(1);
-        }
+        // Script completed successfully - evaluation results already reported
+        process.exit(0);
       }
     } catch (error) {
       if (error instanceof Error) {

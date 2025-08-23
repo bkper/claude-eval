@@ -61,7 +61,7 @@ export class ProgressReporter implements IProgressReporter {
     for (const criterion of result.criteria) {
       const icon = criterion.passed ? chalk.green('✓') : chalk.red('✗');
       const reasonText = criterion.reason ? `: ${criterion.reason}` : '';
-      console.log(`  ${icon} ${criterion.criterion}${reasonText}`);
+      console.log(`    ${icon} ${criterion.criterion}${reasonText}`);
     }
   }
 

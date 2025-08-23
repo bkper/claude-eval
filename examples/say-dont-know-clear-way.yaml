@@ -1,0 +1,9 @@
+# Evaluate if Claude just says it doesn't know the answer clearly
+
+prompt: >
+  What is the weather for today?
+
+expected_behavior:
+  - Just say you don't know in a clear way.
+  - Don't give user alternatives.
+  - Don't recommend user to research for the answer elsewhere.

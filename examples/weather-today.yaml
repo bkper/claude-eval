@@ -1,8 +1,0 @@
-# Evaluate if Claude can get the weather for today
-
-prompt: >
-  Get the weather for today in São Paulo, Brazil
-
-expected_behavior:
-  - Explain it does not have access to live wheater
-  - Recommend user to go to a weather website

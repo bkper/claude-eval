@@ -2,16 +2,20 @@
 
 Simple evaluation tool for Claude Code AI agent responses using LLM-as-a-judge methodology. 
 
-Some problems faced as scale Claude Code usage:
+Problems faced when changing Claude Code contexts:
 
-- When you change a project, user or company CLAUDE.md file:
-  - How can you know it was a good or bad change?
-  - How can you know if the change is working as expected?
-  - How can you know if the change is breaking something for other users?
+- How can you know if the change is working as expected?
+- How can you know it was a good or bad change?
+- How can you know if the change is breaking something for other team members?
 - As the SONNET-next, OPUS-next, etc. models released, how can you know if the current setup is still working as expected?
 
-Built on Claude SDK, this tool helps test and validate Claude Code responses against defined criteria, creating a eval-driven development loop for a sustainable Claude Code usage.
 
+
+
+
+Built on Claude SDK, this tool enables eval-driven development for Claude Code agents. 
+
+Test responses against defined criteria to ensure consistent, reliable AI behavior across your team and model updates.
 
 ## Usage
 

@@ -1,8 +1,8 @@
-# Evaluate if Claude suggests TypeScript for new projects
+# Evaluate if Claude Code recommends Typescript instead of Javascript
 
 prompt: >
   Create a simple hello world web application 
-  to show a message "Hello World" with a fancy animation in the browser.
+  to show a message "Hello World" in the browser.
 
 expected_behavior:
   - Recommends TypeScript for the new project

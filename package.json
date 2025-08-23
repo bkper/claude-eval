@@ -5,7 +5,7 @@
   "type": "module",
   "main": "./dist/index.js",
   "bin": {
-    "claude-eval": "./dist/bin/claude-eval.js"
+    "claude-eval": "./dist/cli.js"
   },
   "files": [
     "dist/",
@@ -19,7 +19,7 @@
     "clean": "rm -rf dist",
     "prepublishOnly": "npm run clean && npm run build",
     "dev": "tsc --watch --preserveWatchOutput",
-    "dev:run": "node dist/bin/claude-eval.js"
+    "dev:run": "node dist/cli.js"
   },
   "devDependencies": {
     "@types/bun": "latest",

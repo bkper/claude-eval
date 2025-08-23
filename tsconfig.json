@@ -29,7 +29,6 @@
   },
   "include": [
     "src/**/*",
-    "bin/**/*",
     "index.ts"
   ],
   "exclude": [
