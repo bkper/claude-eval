@@ -23,7 +23,7 @@ export class JudgeEvaluator {
       const messages = [];
       let judgeResponseText = '';
       
-      for await (const message of query({ prompt: judgePrompt, options: { permissionMode: 'default' } })) {
+      for await (const message of query({ prompt: judgePrompt, options: { permissionMode: 'default', model: 'haiku' } })) {
         messages.push(message);
         
         // Show partial judge responses in verbose mode

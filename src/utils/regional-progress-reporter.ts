@@ -73,7 +73,7 @@ export class BufferedRegionalReporter implements RegionalProgressReporter {
     for (const criterion of result.criteria) {
       const icon = criterion.passed ? chalk.green('✓') : chalk.red('✗');
       const reasonText = criterion.reason ? `: ${criterion.reason}` : '';
-      this.buffer.add(`  ${icon} ${criterion.criterion}${reasonText}`);
+      this.buffer.add(`    ${icon} ${criterion.criterion}${reasonText}`);
     }
   }
 

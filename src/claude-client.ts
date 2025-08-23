@@ -33,7 +33,7 @@ Remember: Text response only, no file operations or tool usage.`
       const messages = [];
       let responseText = '';
       
-      for await (const message of query({ prompt, options: { permissionMode: 'default', cwd: options.cwd } })) {
+      for await (const message of query({ prompt, options: { permissionMode: 'default', cwd: options.cwd, model: 'sonnet' } })) {
         messages.push(message);
         
         // Show partial responses in verbose mode
