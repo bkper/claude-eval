@@ -141,6 +141,7 @@ export class TerminalProgressManager {
           console.log(TerminalFormatter.formatError(filename));
         }
       }
+      console.log(); // Add spacing before command prompt
     }
   }
 
