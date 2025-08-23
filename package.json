@@ -9,8 +9,7 @@
   },
   "files": [
     "dist/",
-    "README.md",
-    "imgs/"
+    "README.md"
   ],
   "scripts": {
     "test": "jest",
@@ -18,9 +17,14 @@
     "test:coverage": "jest --coverage",
     "build": "tsc",
     "clean": "rm -rf dist",
-    "prepublishOnly": "bun run clean && bun run build",
     "dev": "tsc --watch --preserveWatchOutput",
-    "dev:run": "node dist/cli.js"
+    "dev:run": "node dist/cli.js",
+    "patch": "yarn version --patch",
+    "minor": "yarn version --minor",
+    "major": "yarn version --major",
+    "preversion": "bun run clean && bun run build",
+    "postversion": "git push --tags && yarn publish --new-version $npm_package_version && git push && echo \"Successfully released version $npm_package_version!\""
+
   },
   "devDependencies": {
     "@types/bun": "latest",

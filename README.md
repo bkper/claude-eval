@@ -14,7 +14,7 @@ Problems faced when changing Claude Code contexts and models:
 
 This tool solves those problems by enabling Eval-driven development for Claude Code. 
 
-![Claude Code Eval Demo](imgs/claude-eval.gif)
+![Claude Code Eval Demo](https://github.com/bkper/claude-eval/blob/main/imgs/claude-eval.gif?raw=1)
 
 No complex scoring or ranking — just clear PASSED ✅ / FAILED ❌ results for your evaluation criteria.
 
