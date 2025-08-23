@@ -8,9 +8,11 @@ Problems faced when changing Claude Code contexts and models:
 - How can you know it was a good or bad change?
 - How can you know if the change is NOT breaking something else?
 
-This tool solve those problems by enabling Eval-driven development for Claude Code. 
+This tool solves those problems by enabling Eval-driven development for Claude Code. 
 
 ![Claude Code Eval Demo](imgs/claude-code-eval.gif)
+
+No complex scoring or ranking — just clear PASSED ✅ / FAILED ❌ results for your evaluation criteria.
 
 It's like TDD for your Claude Code agent.
 
@@ -67,7 +69,7 @@ expected_behavior:
 ## How It Works
 
 1. **Parse YAML**: Loads and validates the evaluation specification
-2. **Query Claude**: Executes the prompt using Claude Code SDK in plan mode
-3. **Judge Response**: Uses LLM-as-a-judge to evaluate the response against criteria
+2. **Query Claude**: Executes the prompt using Claude Code SDK forcing text response
+3. **Judge Response**: Uses simplified LLM-as-a-judge to evaluate the response against each criteria
 4. **Format Results**: Displays results with ✅/❌ indicators and summary
 
