@@ -1,6 +1,6 @@
 {
   "name": "claude-eval",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Simple evaluation tool for Claude Code. PASS/FAIL testing with LLM-as-a-judge simplified approach.",
   "type": "module",
   "repository": {
