@@ -1,3 +1,5 @@
+import type { EvaluationResult } from './result-formatter.js';
+
 // Common interface for progress reporting
 export interface IProgressReporter {
   startEvaluation(filename: string): void;
@@ -5,7 +7,8 @@ export interface IProgressReporter {
   stepStarted(step: string): void;
   stepFailed(step: string, error?: string): void;
   partialResponse(response: string, maxLength?: number): void;
-  evaluationCompleted(filename: string, success: boolean, totalDuration?: number): void;
+  evaluationStepCompleted(step: string, result: EvaluationResult, duration?: number): void;
+  evaluationCompleted(filename: string, result: EvaluationResult, totalDuration?: number): void;
   error(message: string): void;
   info(message: string): void;
   debug(message: string): void;

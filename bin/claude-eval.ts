@@ -56,9 +56,8 @@ program
         
         if (options.format === 'json') {
           console.log(formatter.formatJSON(result));
-        } else {
-          console.log(formatter.formatConsole(result));
         }
+        // For console format, the progress reporter already shows the detailed output
         
         // Exit with non-zero code if evaluation failed
         if (!result.overall) {

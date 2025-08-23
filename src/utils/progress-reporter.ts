@@ -1,5 +1,6 @@
 import chalk from 'chalk';
 import { IProgressReporter } from './progress-reporter-interface.js';
+import type { EvaluationResult } from './result-formatter.js';
 
 export type ProgressLevel = 'quiet' | 'normal' | 'verbose';
 
@@ -50,6 +51,20 @@ export class ProgressReporter implements IProgressReporter {
     console.log(`  ${chalk.green('✓')} ${step}${durationText}`);
   }
 
+  evaluationStepCompleted(step: string, result: EvaluationResult, duration?: number): void {
+    if (this.level === 'quiet') return;
+    
+    const durationText = duration ? chalk.gray(` (${(duration / 1000).toFixed(1)}s)`) : '';
+    console.log(`  ${chalk.green('✓')} ${step}${durationText}`);
+    
+    // Show detailed per-criteria results  
+    for (const criterion of result.criteria) {
+      const icon = criterion.passed ? chalk.green('✓') : chalk.red('✗');
+      const reasonText = criterion.reason ? `: ${criterion.reason}` : '';
+      console.log(`  ${icon} ${criterion.criterion}${reasonText}`);
+    }
+  }
+
   stepStarted(step: string): void {
     if (this.level === 'quiet') return;
     
@@ -72,13 +87,13 @@ export class ProgressReporter implements IProgressReporter {
     console.log(chalk.gray(`    → ${truncated.replace(/\n/g, ' ')}`));
   }
 
-  evaluationCompleted(filename: string, success: boolean, totalDuration?: number): void {
+  evaluationCompleted(filename: string, result: EvaluationResult, totalDuration?: number): void {
     if (this.level === 'quiet') return;
     
     const duration = totalDuration || (Date.now() - this.startTime);
     const durationText = chalk.gray(` (${(duration / 1000).toFixed(1)}s)`);
-    const icon = success ? chalk.green('✅') : chalk.red('❌');
-    const status = success ? 'PASSED' : 'FAILED';
+    const icon = result.overall ? chalk.green('✅') : chalk.red('❌');
+    const status = result.overall ? 'PASSED' : 'FAILED';
     
     console.log(`  ${icon} ${status}${durationText}\n`);
   }

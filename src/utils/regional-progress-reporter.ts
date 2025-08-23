@@ -1,6 +1,8 @@
+import chalk from 'chalk';
 import { ProgressLevel } from './progress-reporter.js';
 import { IProgressReporter } from './progress-reporter-interface.js';
 import { OutputBuffer, TerminalFormatter } from './terminal-utils.js';
+import type { EvaluationResult } from './result-formatter.js';
 
 export interface RegionalProgressReporter extends IProgressReporter {
   // Additional methods specific to regional reporters if needed
@@ -62,6 +64,19 @@ export class BufferedRegionalReporter implements RegionalProgressReporter {
     this.buffer.add(TerminalFormatter.formatStep(step, 'success', duration));
   }
 
+  evaluationStepCompleted(step: string, result: EvaluationResult, duration?: number): void {
+    if (this.level === 'quiet') return;
+    
+    this.buffer.add(TerminalFormatter.formatStep(step, 'success', duration));
+    
+    // Add detailed per-criteria results
+    for (const criterion of result.criteria) {
+      const icon = criterion.passed ? chalk.green('✓') : chalk.red('✗');
+      const reasonText = criterion.reason ? `: ${criterion.reason}` : '';
+      this.buffer.add(`  ${icon} ${criterion.criterion}${reasonText}`);
+    }
+  }
+
   stepStarted(step: string): void {
     if (this.level === 'quiet') return;
     
@@ -81,13 +96,13 @@ export class BufferedRegionalReporter implements RegionalProgressReporter {
     this.buffer.add(TerminalFormatter.formatPartialResponse(response, maxLength));
   }
 
-  evaluationCompleted(filename: string, success: boolean, totalDuration?: number): void {
+  evaluationCompleted(filename: string, result: EvaluationResult, totalDuration?: number): void {
     if (this.level === 'quiet') return;
     
     const duration = totalDuration || (Date.now() - this.startTime);
-    const status = success ? 'PASSED' : 'FAILED';
+    const status = result.overall ? 'PASSED' : 'FAILED';
     
-    this.buffer.add(TerminalFormatter.formatStep(status, success ? 'success' : 'error', duration));
+    this.buffer.add(TerminalFormatter.formatStep(status, result.overall ? 'success' : 'error', duration));
     this.buffer.addEmpty();
   }
 

@@ -55,7 +55,7 @@ export class EvalRunner {
       
       if (progressReporter) {
         const totalDuration = Date.now() - startTime;
-        progressReporter.evaluationCompleted(filePath, result.overall, totalDuration);
+        progressReporter.evaluationCompleted(filePath, result, totalDuration);
       }
       
       return result;
@@ -63,7 +63,15 @@ export class EvalRunner {
       if (progressReporter) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         progressReporter.stepFailed('Evaluation', errorMessage);
-        progressReporter.evaluationCompleted(filePath, false);
+        const errorResult: EvaluationResult = {
+          overall: false,
+          criteria: [{
+            criterion: 'File processing',
+            passed: false,
+            reason: errorMessage
+          }]
+        };
+        progressReporter.evaluationCompleted(filePath, errorResult);
       }
       throw error;
     }

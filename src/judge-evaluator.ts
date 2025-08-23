@@ -51,7 +51,11 @@ export class JudgeEvaluator {
       if (progressReporter) {
         const duration = Date.now() - startTime;
         const passedCount = evaluatedCriteria.filter(c => c.passed).length;
-        progressReporter.stepCompleted(`Evaluation complete (${passedCount}/${criteria.length} criteria passed)`, duration);
+        const result = {
+          overall,
+          criteria: evaluatedCriteria
+        };
+        progressReporter.evaluationStepCompleted(`Evaluation complete (${passedCount}/${criteria.length} criteria passed)`, result, duration);
       }
       
       return {

@@ -9,7 +9,7 @@ export interface ClaudeOptions {
 
 export class ClaudeClient {
   async execute(prompt: string, options: ClaudeOptions = {}): Promise<string> {
-    const timeout = options.timeout || 120000; // 2 minutes default
+    const timeout = options.timeout || 180000; // 2 minutes default
     const progressReporter = options.progressReporter;
     const startTime = Date.now();
     
