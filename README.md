@@ -1,4 +1,4 @@
-# claude-code-eval
+# claude-eval
 
 [![npm version](https://badge.fury.io/js/claude-eval.svg)](https://badge.fury.io/js/claude-eval)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -14,7 +14,7 @@ Problems faced when changing Claude Code contexts and models:
 
 This tool solves those problems by enabling Eval-driven development for Claude Code. 
 
-![Claude Code Eval Demo](imgs/claude-code-eval.gif)
+![Claude Code Eval Demo](imgs/claude-eval.gif)
 
 No complex scoring or ranking — just clear PASSED ✅ / FAILED ❌ results for your evaluation criteria.
 
@@ -90,7 +90,7 @@ We welcome contributions! Please:
 4. **Update documentation** as needed
 5. **Keep it simple** - this tool is intentionally minimal and focused
 
-For bug reports and feature requests, please use the [GitHub Issues](https://github.com/bkper/claude-code-eval/issues) page.
+For bug reports and feature requests, please use the [GitHub Issues](https://github.com/bkper/claude-eval/issues) page.
 
 ## Limitations & Known Issues
 
