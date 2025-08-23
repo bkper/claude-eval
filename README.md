@@ -23,7 +23,7 @@ It's like TDD for AI.
 
 ### Prerequisites
 - Node.js 18+ or Bun
-- Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview) installed and configured in your project
+- [Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview) installed and configured in your project
 
 
 ## Usage
