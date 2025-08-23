@@ -23,14 +23,6 @@ export class ProgressReporter implements IProgressReporter {
     
     this.totalBatchCount = totalCount;
     this.currentBatchIndex = 0;
-    
-    const actualRunning = Math.min(concurrency, totalCount);
-    
-    if (actualRunning === 1) {
-      console.log(chalk.blue('🚀 Running 1 evaluation'));
-    } else {
-      console.log(chalk.blue(`🚀 Running ${actualRunning} evaluations`));
-    }
   }
 
   startEvaluation(filename: string): void {

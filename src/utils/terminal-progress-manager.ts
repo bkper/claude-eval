@@ -33,18 +33,10 @@ export class TerminalProgressManager {
     this.concurrency = concurrency;
     this.regions.clear();
     
-    const actualRunning = Math.min(concurrency, totalCount);
-    
-    if (actualRunning === 1) {
-      console.log(TerminalFormatter.formatHeader('Running 1 evaluation', 'main'));
-    } else {
-      console.log(TerminalFormatter.formatHeader(`Running ${actualRunning} evaluations`, 'main'));
-      
-      // Start progress indicator for multiple evaluations
-      this.isShowingProgress = true;
-      this.progressIndicator.start();
-      this.updateProgressIndicator();
-    }
+    // Start progress indicator for all evaluations
+    this.isShowingProgress = true;
+    this.progressIndicator.start();
+    this.updateProgressIndicator();
   }
 
   createRegionalReporter(regionId: string, evaluationIndex: number): BufferedRegionalReporter {
