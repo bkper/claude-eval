@@ -18,7 +18,7 @@ export class ProgressReporter implements IProgressReporter {
     this.level = options.level;
   }
 
-  startBatch(totalCount: number, concurrency: number = 5): void {
+  startBatch(totalCount: number, _concurrency: number = 5): void {
     if (this.level === 'quiet') return;
     
     this.totalBatchCount = totalCount;
@@ -92,7 +92,7 @@ export class ProgressReporter implements IProgressReporter {
     console.log(chalk.gray(`    → ${truncated.replace(/\n/g, ' ')}`));
   }
 
-  evaluationCompleted(filename: string, result: EvaluationResult, totalDuration?: number): void {
+  evaluationCompleted(_filename: string, result: EvaluationResult, totalDuration?: number): void {
     if (this.level === 'quiet') return;
     
     const duration = totalDuration || (Date.now() - this.startTime);
@@ -196,6 +196,46 @@ export class ProgressReporter implements IProgressReporter {
     suggestions.forEach(suggestion => {
       console.log(chalk.yellow(`   • ${suggestion}`));
     });
+  }
+
+  logBinaryInfo(binaryPath: string, version?: string, workingDir?: string): void {
+    if (this.level !== 'verbose') return;
+    
+    console.log(chalk.blue('🔧 Claude Code Binary Information:'));
+    console.log(chalk.gray(`   Path: ${binaryPath}`));
+    if (version) {
+      console.log(chalk.gray(`   Version: ${version}`));
+    }
+    if (workingDir) {
+      console.log(chalk.gray(`   Working Directory: ${workingDir}`));
+    }
+  }
+
+  logEnvironmentContext(envVars: Record<string, string | undefined>): void {
+    if (this.level !== 'verbose') return;
+    
+    console.log(chalk.blue('🌍 Environment Context:'));
+    Object.entries(envVars).forEach(([key, value]) => {
+      if (value !== undefined) {
+        // Truncate very long environment values (like PATH) for readability
+        const displayValue = value.length > 100 ? value.substring(0, 100) + '...' : value;
+        console.log(chalk.gray(`   ${key}: ${displayValue}`));
+      } else {
+        console.log(chalk.gray(`   ${key}: <not set>`));
+      }
+    });
+  }
+
+  logExecutionCommand(command: string, args?: string[], pid?: number): void {
+    if (this.level !== 'verbose') return;
+    
+    console.log(chalk.blue('⚡ Execution Command:'));
+    const fullCommand = args ? `${command} ${args.join(' ')}` : command;
+    console.log(chalk.gray(`   Command: ${fullCommand}`));
+    if (pid) {
+      console.log(chalk.gray(`   Process ID: ${pid}`));
+    }
+    console.log(chalk.gray(`   Timestamp: ${new Date().toISOString()}`));
   }
 
   private truncateContent(content: string, maxLength: number): string {

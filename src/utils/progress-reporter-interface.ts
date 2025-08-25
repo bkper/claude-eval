@@ -17,4 +17,7 @@ export interface IProgressReporter {
   logJudgePrompt(prompt: string): void;
   logJudgeResponse(response: string): void;
   showSuggestions?(suggestions: string[]): void;
+  logBinaryInfo(binaryPath: string, version?: string, workingDir?: string): void;
+  logEnvironmentContext(envVars: Record<string, string | undefined>): void;
+  logExecutionCommand(command: string, args?: string[], pid?: number): void;
 }

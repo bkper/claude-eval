@@ -177,6 +177,46 @@ export class BufferedRegionalReporter implements RegionalProgressReporter {
     });
   }
 
+  logBinaryInfo(binaryPath: string, version?: string, workingDir?: string): void {
+    if (this.level !== 'verbose') return;
+    
+    this.buffer.add(chalk.blue('🔧 Claude Code Binary Information:'));
+    this.buffer.add(TerminalFormatter.formatContent(`   Path: ${binaryPath}`));
+    if (version) {
+      this.buffer.add(TerminalFormatter.formatContent(`   Version: ${version}`));
+    }
+    if (workingDir) {
+      this.buffer.add(TerminalFormatter.formatContent(`   Working Directory: ${workingDir}`));
+    }
+  }
+
+  logEnvironmentContext(envVars: Record<string, string | undefined>): void {
+    if (this.level !== 'verbose') return;
+    
+    this.buffer.add(chalk.blue('🌍 Environment Context:'));
+    Object.entries(envVars).forEach(([key, value]) => {
+      if (value !== undefined) {
+        // Truncate very long environment values (like PATH) for readability
+        const displayValue = value.length > 100 ? value.substring(0, 100) + '...' : value;
+        this.buffer.add(TerminalFormatter.formatContent(`   ${key}: ${displayValue}`));
+      } else {
+        this.buffer.add(TerminalFormatter.formatContent(`   ${key}: <not set>`));
+      }
+    });
+  }
+
+  logExecutionCommand(command: string, args?: string[], pid?: number): void {
+    if (this.level !== 'verbose') return;
+    
+    this.buffer.add(chalk.blue('⚡ Execution Command:'));
+    const fullCommand = args ? `${command} ${args.join(' ')}` : command;
+    this.buffer.add(TerminalFormatter.formatContent(`   Command: ${fullCommand}`));
+    if (pid) {
+      this.buffer.add(TerminalFormatter.formatContent(`   Process ID: ${pid}`));
+    }
+    this.buffer.add(TerminalFormatter.formatContent(`   Timestamp: ${new Date().toISOString()}`));
+  }
+
   private truncateContent(content: string, maxLength: number): string {
     if (content.length <= maxLength) {
       return content;
