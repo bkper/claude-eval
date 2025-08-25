@@ -1,11 +1,9 @@
 import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 
-// Mock the ClaudeApiConnector
-const mockQueryRaw = jest.fn();
-jest.mock('../src/claude-api-connector', () => ({
-  ClaudeApiConnector: jest.fn().mockImplementation(() => ({
-    queryRaw: mockQueryRaw,
-  })),
+// Mock the Claude SDK
+const mockQuery = jest.fn();
+jest.mock('@anthropic-ai/claude-code', () => ({
+  query: mockQuery,
 }));
 
 import { ClaudeClient } from '../src/claude-client';
@@ -20,7 +18,7 @@ describe('ClaudeClient', () => {
 
   it('should execute prompt and return response', async () => {
     const mockResponse = 'Test response from Claude';
-    mockQueryRaw.mockImplementation(async function* () {
+    mockQuery.mockImplementation(async function* () {
       yield { type: 'result', result: mockResponse };
     });
 
@@ -31,14 +29,18 @@ describe('ClaudeClient', () => {
 User prompt: Test prompt
 
 REMEMBER: Text response only, no file operations or tool usage.`;
-    expect(mockQueryRaw).toHaveBeenCalledWith(expectedPrompt, expect.objectContaining({
-      cwd: undefined,
-      model: 'sonnet'
-    }));
+    expect(mockQuery).toHaveBeenCalledWith({
+      prompt: expectedPrompt,
+      options: expect.objectContaining({
+        cwd: undefined,
+        model: 'sonnet',
+        permissionMode: 'default'
+      })
+    });
   });
 
   it('should pass permissionMode: default option to SDK', async () => {
-    mockQueryRaw.mockImplementation(async function* () {
+    mockQuery.mockImplementation(async function* () {
       yield { type: 'result', result: 'Response' };
     });
 
@@ -48,14 +50,18 @@ REMEMBER: Text response only, no file operations or tool usage.`;
 User prompt: Test prompt
 
 REMEMBER: Text response only, no file operations or tool usage.`;
-    expect(mockQueryRaw).toHaveBeenCalledWith(expectedPrompt, expect.objectContaining({
-      cwd: undefined,
-      model: 'sonnet'
-    }));
+    expect(mockQuery).toHaveBeenCalledWith({
+      prompt: expectedPrompt,
+      options: expect.objectContaining({
+        cwd: undefined,
+        model: 'sonnet',
+        permissionMode: 'default'
+      })
+    });
   });
 
   it('should handle multiple message chunks and concatenate them', async () => {
-    mockQueryRaw.mockImplementation(async function* () {
+    mockQuery.mockImplementation(async function* () {
       yield { type: 'result', result: 'First part ' };
       yield { type: 'result', result: 'second part' };
     });
@@ -65,7 +71,7 @@ REMEMBER: Text response only, no file operations or tool usage.`;
   });
 
   it('should handle SDK errors gracefully (network, rate limits, auth)', async () => {
-    mockQueryRaw.mockImplementation(async function* () {
+    mockQuery.mockImplementation(async function* () {
       throw new Error('Network error');
     });
 
@@ -73,7 +79,7 @@ REMEMBER: Text response only, no file operations or tool usage.`;
   });
 
   it('should ignore non-result message types (status, progress)', async () => {
-    mockQueryRaw.mockImplementation(async function* () {
+    mockQuery.mockImplementation(async function* () {
       yield { type: 'status', content: 'Starting...' };
       yield { type: 'result', result: 'Actual response' };
       yield { type: 'progress', content: '50%' };
@@ -84,7 +90,7 @@ REMEMBER: Text response only, no file operations or tool usage.`;
   });
 
   it('should timeout after configurable duration', async () => {
-    mockQueryRaw.mockImplementation(async function* () {
+    mockQuery.mockImplementation(async function* () {
       await new Promise(resolve => setTimeout(resolve, 2000));
       yield { type: 'result', result: 'Response' };
     });

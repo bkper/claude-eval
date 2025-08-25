@@ -1,11 +1,9 @@
 import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 
-// Mock the ClaudeApiConnector
-const mockQueryRaw = jest.fn();
-jest.mock('../src/claude-api-connector', () => ({
-  ClaudeApiConnector: jest.fn().mockImplementation(() => ({
-    queryRaw: mockQueryRaw,
-  })),
+// Mock the Claude SDK
+const mockQuery = jest.fn();
+jest.mock('@anthropic-ai/claude-code', () => ({
+  query: mockQuery,
 }));
 
 import { JudgeEvaluator } from '../src/judge-evaluator';
@@ -23,7 +21,7 @@ describe('JudgeEvaluator', () => {
 Criterion 1: ✅ PASS - The response recommends TypeScript
 Criterion 2: ❌ FAIL - No tsconfig.json was mentioned
 `;
-    mockQueryRaw.mockImplementation(async function* () {
+    mockQuery.mockImplementation(async function* () {
       yield { type: 'result', result: mockJudgeResponse };
     });
 
@@ -46,7 +44,7 @@ Criterion 2: ❌ FAIL - No tsconfig.json was mentioned
 ✅ Criterion 1: PASS
 ❌ Criterion 2: FAIL
 `;
-    mockQueryRaw.mockImplementation(async function* () {
+    mockQuery.mockImplementation(async function* () {
       yield { type: 'result', result: mockJudgeResponse };
     });
 
@@ -61,7 +59,7 @@ Criterion 2: ❌ FAIL - No tsconfig.json was mentioned
 Criterion 1: Somewhat unclear
 Criterion 2: Ambiguous result
 `;
-    mockQueryRaw.mockImplementation(async function* () {
+    mockQuery.mockImplementation(async function* () {
       yield { type: 'result', result: mockJudgeResponse };
     });
 
@@ -73,7 +71,7 @@ Criterion 2: Ambiguous result
   });
 
   it('should construct proper judge prompt with response and criteria', async () => {
-    mockQueryRaw.mockImplementation(async function* () {
+    mockQuery.mockImplementation(async function* () {
       yield { type: 'result', result: '✅ All good' };
     });
 
@@ -82,7 +80,8 @@ Criterion 2: Ambiguous result
 
     await evaluator.evaluate(response, criteria);
 
-    const calledPrompt = (mockQueryRaw as jest.MockedFunction<any>).mock.calls[0][0];
+    const calledArgs = (mockQuery as jest.MockedFunction<any>).mock.calls[0][0];
+    const calledPrompt = calledArgs.prompt;
     expect(calledPrompt).toContain(response);
     expect(calledPrompt).toContain('Should work');
     expect(calledPrompt).toContain('✅');
@@ -90,7 +89,7 @@ Criterion 2: Ambiguous result
   });
 
   it('should handle empty responses', async () => {
-    mockQueryRaw.mockImplementation(async function* () {
+    mockQuery.mockImplementation(async function* () {
       yield { type: 'result', result: '❌ Empty response fails all criteria' };
     });
 
@@ -100,7 +99,7 @@ Criterion 2: Ambiguous result
   });
 
   it('should handle malformed judge responses gracefully', async () => {
-    mockQueryRaw.mockImplementation(async function* () {
+    mockQuery.mockImplementation(async function* () {
       yield { type: 'result', result: 'Completely malformed response with no indicators' };
     });
 

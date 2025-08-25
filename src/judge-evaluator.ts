@@ -1,11 +1,10 @@
+import { query, Options } from '@anthropic-ai/claude-code';
 import type { EvaluationResult, CriterionResult } from './utils/result-formatter.js';
 import { BaseProgressReporter } from './utils/base-progress-reporter.js';
-import { ClaudeApiConnector } from './claude-api-connector.js';
 
 export type { EvaluationResult, CriterionResult };
 
 export class JudgeEvaluator {
-  private apiConnector = new ClaudeApiConnector();
 
   async evaluate(response: string, criteria: string[], progressReporter?: BaseProgressReporter): Promise<EvaluationResult> {
     const startTime = Date.now();
@@ -22,7 +21,12 @@ export class JudgeEvaluator {
       const messages = [];
       let judgeResponseText = '';
       
-      for await (const message of this.apiConnector.queryRaw(judgePrompt, { permissionMode: 'default', model: 'haiku' })) {
+      const judgeOptions: Options = { 
+        permissionMode: 'default', 
+        model: 'haiku' 
+      };
+      
+      for await (const message of query({ prompt: judgePrompt, options: judgeOptions })) {
         messages.push(message);
         
         // Show partial judge responses in verbose mode
@@ -88,7 +92,7 @@ Response to evaluate:
 ${response}
 
 Criteria to evaluate against:
-${criteria.map((c, i) => `${c}`).join('\n')}
+${criteria.map(c => `${c}`).join('\n')}
 
 For each criterion, respond with either:
 - ✅ [Brief reason why it passes]

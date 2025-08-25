@@ -1,5 +1,5 @@
+import { query, Options } from '@anthropic-ai/claude-code';
 import { BaseProgressReporter } from './utils/base-progress-reporter.js';
-import { ClaudeApiConnector } from './claude-api-connector.js';
 
 export interface ClaudeOptions {
   timeout?: number;
@@ -9,10 +9,8 @@ export interface ClaudeOptions {
 
 
 export class ClaudeClient {
-  private apiConnector: ClaudeApiConnector;
-  
   constructor() {
-    this.apiConnector = new ClaudeApiConnector();
+    // Direct SDK usage - no wrapper needed
   }
 
   async execute(prompt: string, options: ClaudeOptions = {}): Promise<string> {
@@ -40,10 +38,10 @@ REMEMBER: Text response only, no file operations or tool usage.`
       let responseText = '';
       
       try {
-        const queryOptions = { 
+        const queryOptions: Options = { 
           cwd: options.cwd, 
           model: 'sonnet',
-          progressReporter 
+          permissionMode: 'default'
         };
         
         if (progressReporter) {
@@ -51,7 +49,7 @@ REMEMBER: Text response only, no file operations or tool usage.`
           progressReporter.debug(`Query options: ${JSON.stringify({ cwd: queryOptions.cwd, model: queryOptions.model }, null, 2)}`);
         }
         
-        for await (const message of this.apiConnector.queryRaw(prompt, queryOptions)) {
+        for await (const message of query({ prompt, options: queryOptions })) {
           messages.push(message);
           
           // Show partial responses in verbose mode
