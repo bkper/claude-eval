@@ -2,20 +2,20 @@ import { query } from '@anthropic-ai/claude-code';
 import { execSync } from 'child_process';
 import { existsSync } from 'fs';
 import { join } from 'path';
-import { IProgressReporter } from './utils/progress-reporter-interface.js';
+import { BaseProgressReporter } from './utils/base-progress-reporter.js';
 
 export interface ClaudeQueryOptions {
   permissionMode?: string;
   cwd?: string;
   model?: string;
-  progressReporter?: IProgressReporter;
+  progressReporter?: BaseProgressReporter;
   [key: string]: any;
 }
 
 export class ClaudeApiConnector {
   private claudeExecutablePath: string | undefined;
 
-  private findClaudeExecutable(progressReporter?: IProgressReporter): string | undefined {
+  private findClaudeExecutable(progressReporter?: BaseProgressReporter): string | undefined {
     if (this.claudeExecutablePath) {
       if (progressReporter) {
         progressReporter.logBinaryInfo(

@@ -1,5 +1,5 @@
 import type { EvaluationResult, CriterionResult } from './utils/result-formatter.js';
-import { IProgressReporter } from './utils/progress-reporter-interface.js';
+import { BaseProgressReporter } from './utils/base-progress-reporter.js';
 import { ClaudeApiConnector } from './claude-api-connector.js';
 
 export type { EvaluationResult, CriterionResult };
@@ -7,7 +7,7 @@ export type { EvaluationResult, CriterionResult };
 export class JudgeEvaluator {
   private apiConnector = new ClaudeApiConnector();
 
-  async evaluate(response: string, criteria: string[], progressReporter?: IProgressReporter): Promise<EvaluationResult> {
+  async evaluate(response: string, criteria: string[], progressReporter?: BaseProgressReporter): Promise<EvaluationResult> {
     const startTime = Date.now();
     
     if (progressReporter) {

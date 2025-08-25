@@ -1,30 +1,26 @@
 import chalk from 'chalk';
-import { IProgressReporter } from './progress-reporter-interface.js';
-import type { EvaluationResult } from './result-formatter.js';
-
-export type ProgressLevel = 'quiet' | 'normal' | 'verbose';
+import { BaseProgressReporter, ProgressLevel } from './base-progress-reporter.js';
 
 export interface ProgressOptions {
   level: ProgressLevel;
 }
 
-export class ProgressReporter implements IProgressReporter {
-  private level: ProgressLevel;
+export { ProgressLevel } from './base-progress-reporter.js';
+
+export class ProgressReporter extends BaseProgressReporter {
   private currentBatchIndex: number = 0;
   private totalBatchCount: number = 0;
   private startTime: number = 0;
 
   constructor(options: ProgressOptions = { level: 'normal' }) {
-    this.level = options.level;
+    super(options.level);
   }
 
-  startBatch(totalCount: number, _concurrency: number = 5): void {
-    if (this.level === 'quiet') return;
-    
-    this.totalBatchCount = totalCount;
-    this.currentBatchIndex = 0;
+  protected output(message: string): void {
+    console.log(message);
   }
 
+  // Override startEvaluation to add batch-specific logic
   startEvaluation(filename: string): void {
     if (this.level === 'quiet') return;
     
@@ -32,67 +28,14 @@ export class ProgressReporter implements IProgressReporter {
     this.startTime = Date.now();
     
     if (this.totalBatchCount > 1) {
-      console.log(chalk.yellow(`\n📋 Running evaluation ${this.currentBatchIndex} of ${this.totalBatchCount}: ${chalk.cyan(filename)}`));
+      this.output(chalk.yellow(`\n📋 Running evaluation ${this.currentBatchIndex} of ${this.totalBatchCount}: ${chalk.cyan(filename)}`));
     } else {
-      console.log(chalk.yellow(`📋 Evaluating: ${chalk.cyan(filename)}`));
+      this.output(chalk.yellow(`📋 Evaluating: ${chalk.cyan(filename)}`));
     }
   }
 
-  stepCompleted(step: string, duration?: number): void {
-    if (this.level === 'quiet') return;
-    
-    const durationText = duration ? chalk.gray(` (${(duration / 1000).toFixed(1)}s)`) : '';
-    console.log(`  ${chalk.green('✓')} ${step}${durationText}`);
-  }
-
-  evaluationStepCompleted(step: string, result: EvaluationResult, duration?: number): void {
-    if (this.level === 'quiet') return;
-    
-    const durationText = duration ? chalk.gray(` (${(duration / 1000).toFixed(1)}s)`) : '';
-    console.log(`  ${chalk.green('✓')} ${step}${durationText}`);
-    
-    // Show detailed per-criteria results  
-    for (const criterion of result.criteria) {
-      const icon = criterion.passed ? chalk.green('✓') : chalk.red('✗');
-      const reasonText = criterion.reason ? `: ${criterion.reason}` : '';
-      console.log(`    ${icon} ${criterion.criterion}${reasonText}`);
-    }
-  }
-
-  stepStarted(step: string): void {
-    if (this.level === 'quiet') return;
-    
-    console.log(`  ${chalk.yellow('⏳')} ${step}...`);
-  }
-
-  stepFailed(step: string, error?: string): void {
-    if (this.level === 'quiet') return;
-    
-    // Split error message by newlines for better formatting
-    if (error && error.includes('\n')) {
-      console.log(`  ${chalk.red('❌')} ${step} failed:`);
-      const lines = error.split('\n');
-      lines.forEach(line => {
-        if (line.trim()) {
-          console.log(`     ${chalk.red(line)}`);
-        }
-      });
-    } else {
-      console.log(`  ${chalk.red('❌')} ${step} failed${error ? ': ' + chalk.red(error) : ''}`);
-    }
-  }
-
-  partialResponse(response: string, maxLength: number = 100): void {
-    if (this.level !== 'verbose') return;
-    
-    const truncated = response.length > maxLength 
-      ? response.substring(0, maxLength) + '...' 
-      : response;
-    
-    console.log(chalk.gray(`    → ${truncated.replace(/\n/g, ' ')}`));
-  }
-
-  evaluationCompleted(_filename: string, result: EvaluationResult, totalDuration?: number): void {
+  // Override evaluationCompleted to use stored start time
+  evaluationCompleted(_filename: string, result: any, totalDuration?: number): void {
     if (this.level === 'quiet') return;
     
     const duration = totalDuration || (Date.now() - this.startTime);
@@ -100,165 +43,9 @@ export class ProgressReporter implements IProgressReporter {
     const icon = result.overall ? chalk.green('✅') : chalk.red('❌');
     const status = result.overall ? 'PASSED' : 'FAILED';
     
-    console.log(`  ${icon} ${status}${durationText}\n`);
+    this.output(`  ${icon} ${status}${durationText}\n`);
   }
 
-  batchCompleted(passedCount: number, totalCount: number, totalDuration: number): void {
-    if (this.level === 'quiet') return;
-    
-    const durationText = chalk.gray(` (${(totalDuration / 1000).toFixed(1)}s total)`);
-    const summary = `${passedCount}/${totalCount} evaluations passed`;
-    
-    if (passedCount === totalCount) {
-      console.log(chalk.green(`🎉 All evaluations completed! ${summary}${durationText}`));
-    } else {
-      console.log(chalk.yellow(`⚠️  Batch completed: ${summary}${durationText}`));
-    }
-  }
 
-  error(message: string): void {
-    if (this.level === 'quiet') return;
-    
-    // Split error message by newlines for better formatting
-    if (message.includes('\n')) {
-      const lines = message.split('\n');
-      console.error(chalk.red(`❌ Error: ${lines[0]}`));
-      lines.slice(1).forEach(line => {
-        if (line.trim()) {
-          console.error(chalk.red(`   ${line}`));
-        }
-      });
-    } else {
-      console.error(chalk.red(`❌ Error: ${message}`));
-    }
-  }
 
-  info(message: string): void {
-    if (this.level === 'quiet') return;
-    
-    console.log(chalk.blue(`ℹ️  ${message}`));
-  }
-
-  debug(message: string): void {
-    if (this.level === 'verbose') {
-      console.log(chalk.gray(`🔍 ${message}`));
-    }
-  }
-
-  logPrompt(prompt: string): void {
-    if (this.level !== 'verbose') return;
-    
-    const truncated = this.truncateContent(prompt, 500);
-    console.log(chalk.blue(`📝 Prompt sent to Claude:`));
-    console.log(chalk.gray(`${truncated}`));
-    if (prompt.length > 500) {
-      console.log(chalk.gray(`    ... (${prompt.length} total characters)`));
-    }
-  }
-
-  logResponse(response: string): void {
-    if (this.level !== 'verbose') return;
-    
-    const truncated = this.truncateContent(response, 500);
-    console.log(chalk.green(`📄 Response received:`));
-    console.log(chalk.gray(`${truncated}`));
-    if (response.length > 500) {
-      console.log(chalk.gray(`    ... (${response.length} total characters)`));
-    }
-  }
-
-  logJudgePrompt(prompt: string): void {
-    if (this.level !== 'verbose') return;
-    
-    const truncated = this.truncateContent(prompt, 500);
-    console.log(chalk.yellow(`⚖️  Judge evaluation prompt:`));
-    console.log(chalk.gray(`${truncated}`));
-    if (prompt.length > 500) {
-      console.log(chalk.gray(`    ... (${prompt.length} total characters)`));
-    }
-  }
-
-  logJudgeResponse(response: string): void {
-    if (this.level !== 'verbose') return;
-    
-    const truncated = this.truncateContent(response, 500);
-    console.log(chalk.cyan(`🔍 Judge response:`));
-    console.log(chalk.gray(`${truncated}`));
-    if (response.length > 500) {
-      console.log(chalk.gray(`    ... (${response.length} total characters)`));
-    }
-  }
-
-  showSuggestions(suggestions: string[]): void {
-    if (this.level === 'quiet' || suggestions.length === 0) return;
-    
-    console.log(chalk.yellow('\n💡 Suggestions:'));
-    suggestions.forEach(suggestion => {
-      console.log(chalk.yellow(`   • ${suggestion}`));
-    });
-  }
-
-  logBinaryInfo(binaryPath: string, version?: string, workingDir?: string): void {
-    if (this.level !== 'verbose') return;
-    
-    console.log(chalk.blue('🔧 Claude Code Binary Information:'));
-    console.log(chalk.gray(`   Path: ${binaryPath}`));
-    if (version) {
-      console.log(chalk.gray(`   Version: ${version}`));
-    }
-    if (workingDir) {
-      console.log(chalk.gray(`   Working Directory: ${workingDir}`));
-    }
-  }
-
-  logEnvironmentContext(envVars: Record<string, string | undefined>): void {
-    if (this.level !== 'verbose') return;
-    
-    console.log(chalk.blue('🌍 Environment Context:'));
-    Object.entries(envVars).forEach(([key, value]) => {
-      if (value !== undefined) {
-        // Truncate very long environment values (like PATH) for readability
-        const displayValue = value.length > 100 ? value.substring(0, 100) + '...' : value;
-        console.log(chalk.gray(`   ${key}: ${displayValue}`));
-      } else {
-        console.log(chalk.gray(`   ${key}: <not set>`));
-      }
-    });
-  }
-
-  logExecutionCommand(command: string, args?: string[], pid?: number): void {
-    if (this.level !== 'verbose') return;
-    
-    console.log(chalk.blue('⚡ Execution Command:'));
-    const fullCommand = args ? `${command} ${args.join(' ')}` : command;
-    console.log(chalk.gray(`   Command: ${fullCommand}`));
-    if (pid) {
-      console.log(chalk.gray(`   Process ID: ${pid}`));
-    }
-    console.log(chalk.gray(`   Timestamp: ${new Date().toISOString()}`));
-  }
-
-  private truncateContent(content: string, maxLength: number): string {
-    if (content.length <= maxLength) {
-      return content;
-    }
-    
-    // Try to truncate at a natural break point (newline, sentence end, word boundary)
-    const truncated = content.substring(0, maxLength);
-    const lastNewline = truncated.lastIndexOf('\n');
-    const lastSentence = Math.max(truncated.lastIndexOf('.'), truncated.lastIndexOf('!'), truncated.lastIndexOf('?'));
-    const lastSpace = truncated.lastIndexOf(' ');
-    
-    // Use the best break point, preferring newline > sentence > word boundary
-    let breakPoint = maxLength;
-    if (lastNewline > maxLength * 0.7) {
-      breakPoint = lastNewline;
-    } else if (lastSentence > maxLength * 0.7) {
-      breakPoint = lastSentence + 1;
-    } else if (lastSpace > maxLength * 0.8) {
-      breakPoint = lastSpace;
-    }
-    
-    return content.substring(0, breakPoint) + (breakPoint < content.length ? '...' : '');
-  }
 }

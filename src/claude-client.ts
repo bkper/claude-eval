@@ -1,10 +1,10 @@
-import { IProgressReporter } from './utils/progress-reporter-interface.js';
+import { BaseProgressReporter } from './utils/base-progress-reporter.js';
 import { ClaudeProcessError, ClaudeTimeoutError, ClaudeAPIError } from './utils/errors.js';
 import { ClaudeApiConnector } from './claude-api-connector.js';
 
 export interface ClaudeOptions {
   timeout?: number;
-  progressReporter?: IProgressReporter;
+  progressReporter?: BaseProgressReporter;
   cwd?: string;
 }
 

@@ -7,7 +7,7 @@ import { JudgeEvaluator } from './judge-evaluator.js';
 import { EvaluationResult, BatchResult } from './utils/result-formatter.js';
 import { ProgressReporter } from './utils/progress-reporter.js';
 import { TerminalProgressManager } from './utils/terminal-progress-manager.js';
-import { IProgressReporter } from './utils/progress-reporter-interface.js';
+import { BaseProgressReporter } from './utils/base-progress-reporter.js';
 import { formatErrorDetails, getErrorSuggestions, EvaluationError } from './utils/errors.js';
 
 export interface RunnerOptions {
@@ -25,7 +25,7 @@ export class EvalRunner {
     this.judgeEvaluator = new JudgeEvaluator();
   }
   
-  async runSingle(filePath: string, progressReporter?: IProgressReporter): Promise<EvaluationResult> {
+  async runSingle(filePath: string, progressReporter?: BaseProgressReporter): Promise<EvaluationResult> {
     const startTime = Date.now();
     let evalSpec: any = null;
     
