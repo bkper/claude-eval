@@ -105,49 +105,17 @@ export abstract class BaseProgressReporter {
     }
   }
 
-  logPrompt(prompt: string): void {
-    if (this.level !== 'verbose') return;
-    
-    const truncated = this.truncateContent(prompt, 500);
-    this.output(chalk.blue(`📝 Prompt sent to Claude:`));
-    this.output(chalk.gray(`${truncated}`));
-    if (prompt.length > 500) {
-      this.output(chalk.gray(`    ... (${prompt.length} total characters)`));
-    }
-  }
-
   logResponse(response: string): void {
     if (this.level !== 'verbose') return;
     
     const truncated = this.truncateContent(response, 500);
     this.output(chalk.green(`📄 Response received:`));
     this.output(chalk.gray(`${truncated}`));
-    if (response.length > 500) {
+    if (response.length > 2000) {
       this.output(chalk.gray(`    ... (${response.length} total characters)`));
     }
   }
 
-  logJudgePrompt(prompt: string): void {
-    if (this.level !== 'verbose') return;
-    
-    const truncated = this.truncateContent(prompt, 500);
-    this.output(chalk.yellow(`⚖️  Judge evaluation prompt:`));
-    this.output(chalk.gray(`${truncated}`));
-    if (prompt.length > 500) {
-      this.output(chalk.gray(`    ... (${prompt.length} total characters)`));
-    }
-  }
-
-  logJudgeResponse(response: string): void {
-    if (this.level !== 'verbose') return;
-    
-    const truncated = this.truncateContent(response, 500);
-    this.output(chalk.cyan(`🔍 Judge response:`));
-    this.output(chalk.gray(`${truncated}`));
-    if (response.length > 500) {
-      this.output(chalk.gray(`    ... (${response.length} total characters)`));
-    }
-  }
 
 
   protected truncateContent(content: string, maxLength: number): string {

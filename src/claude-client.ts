@@ -23,7 +23,6 @@ export class ClaudeClient {
     if (progressReporter) {
       progressReporter.stepStarted('Executing prompt with Claude Code');
       progressReporter.debug(`Prompt length: ${prompt.length} characters`);
-      progressReporter.logPrompt(prompt);
     }
     
     const timeoutPromise = new Promise<never>((_, reject) => {

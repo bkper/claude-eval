@@ -17,9 +17,6 @@ export class JudgeEvaluator {
     
     const judgePrompt = this.constructJudgePrompt(response, criteria);
     
-    if (progressReporter) {
-      progressReporter.logJudgePrompt(judgePrompt);
-    }
     
     try {
       const messages = [];
@@ -44,7 +41,7 @@ export class JudgeEvaluator {
         .join('');
       
       if (progressReporter) {
-        progressReporter.logJudgeResponse(judgeResponse);
+        progressReporter.logResponse(judgeResponse);
       }
       
       const evaluatedCriteria = this.parseJudgeResponse(judgeResponse, criteria);

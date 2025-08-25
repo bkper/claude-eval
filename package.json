@@ -53,10 +53,10 @@
     "ts-jest": "^29.4.1"
   },
   "peerDependencies": {
-    "@anthropic-ai/claude-code": "^1.0.90",
     "typescript": "^5"
   },
   "dependencies": {
+    "@anthropic-ai/claude-code": "^1.0.90",
     "chalk": "^5.6.0",
     "commander": "^14.0.0",
     "glob": "^11.0.3",
