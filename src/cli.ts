@@ -6,7 +6,6 @@ import { EvalRunner } from '../src/eval-runner.js';
 import { ResultFormatter } from '../src/utils/result-formatter.js';
 import { ProgressReporter, type ProgressLevel } from '../src/utils/progress-reporter.js';
 import { TerminalProgressManager } from '../src/utils/terminal-progress-manager.js';
-import { formatErrorDetails, getErrorSuggestions } from '../src/utils/errors.js';
 
 const program = new Command();
 
@@ -81,36 +80,19 @@ program
         process.exit(hasFailures ? 1 : 0);
       }
     } catch (error) {
-      // Format error details for display
-      const errorDetails = formatErrorDetails(error);
-      const suggestions = getErrorSuggestions(error);
-      
-      // Display the error
-      if (progressLevel !== 'quiet') {
-        console.error(`\n${errorDetails}`);
+      // Simple error display
+      if (error instanceof Error) {
+        console.error(`\nError: ${error.message}`);
         
-        // Show suggestions if available
-        if (suggestions.length > 0) {
-          console.error('\n💡 Suggestions:');
-          suggestions.forEach(suggestion => {
-            console.error(`   • ${suggestion}`);
-          });
-        }
-        
-        // In verbose mode, show the full stack trace
-        if (progressLevel === 'verbose' && error instanceof Error && error.stack) {
+        // In verbose mode, show stack trace
+        if (progressLevel === 'verbose' && error.stack) {
           console.error('\nStack trace:');
           console.error(error.stack);
         }
       } else {
-        // In quiet mode, just show the basic error message
-        if (error instanceof Error) {
-          console.error(`Error: ${error.message}`);
-        } else {
-          console.error('Unknown error occurred');
-        }
+        console.error('\nUnknown error occurred');
       }
-      
+
       process.exit(1);
     }
   });

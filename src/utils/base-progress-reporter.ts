@@ -149,54 +149,6 @@ export abstract class BaseProgressReporter {
     }
   }
 
-  showSuggestions(suggestions: string[]): void {
-    if (this.level === 'quiet' || suggestions.length === 0) return;
-    
-    this.output(chalk.yellow('\n💡 Suggestions:'));
-    suggestions.forEach(suggestion => {
-      this.output(chalk.yellow(`   • ${suggestion}`));
-    });
-  }
-
-  logBinaryInfo(binaryPath: string, version?: string, workingDir?: string): void {
-    if (this.level !== 'verbose') return;
-    
-    this.output(chalk.blue('🔧 Claude Code Binary Information:'));
-    this.output(chalk.gray(`   Path: ${binaryPath}`));
-    if (version) {
-      this.output(chalk.gray(`   Version: ${version}`));
-    }
-    if (workingDir) {
-      this.output(chalk.gray(`   Working Directory: ${workingDir}`));
-    }
-  }
-
-  logEnvironmentContext(envVars: Record<string, string | undefined>): void {
-    if (this.level !== 'verbose') return;
-    
-    this.output(chalk.blue('🌍 Environment Context:'));
-    Object.entries(envVars).forEach(([key, value]) => {
-      if (value !== undefined) {
-        // Truncate very long environment values (like PATH) for readability
-        const displayValue = value.length > 100 ? value.substring(0, 100) + '...' : value;
-        this.output(chalk.gray(`   ${key}: ${displayValue}`));
-      } else {
-        this.output(chalk.gray(`   ${key}: <not set>`));
-      }
-    });
-  }
-
-  logExecutionCommand(command: string, args?: string[], pid?: number): void {
-    if (this.level !== 'verbose') return;
-    
-    this.output(chalk.blue('⚡ Execution Command:'));
-    const fullCommand = args ? `${command} ${args.join(' ')}` : command;
-    this.output(chalk.gray(`   Command: ${fullCommand}`));
-    if (pid) {
-      this.output(chalk.gray(`   Process ID: ${pid}`));
-    }
-    this.output(chalk.gray(`   Timestamp: ${new Date().toISOString()}`));
-  }
 
   protected truncateContent(content: string, maxLength: number): string {
     if (content.length <= maxLength) {

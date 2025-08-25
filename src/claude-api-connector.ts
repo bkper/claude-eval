@@ -18,23 +18,13 @@ export class ClaudeApiConnector {
   private findClaudeExecutable(progressReporter?: BaseProgressReporter): string | undefined {
     if (this.claudeExecutablePath) {
       if (progressReporter) {
-        progressReporter.logBinaryInfo(
-          this.claudeExecutablePath,
-          this.getClaudeVersion(this.claudeExecutablePath),
-          process.cwd()
-        );
+        progressReporter.debug(`Using cached Claude binary: ${this.claudeExecutablePath}`);
       }
       return this.claudeExecutablePath;
     }
 
     if (progressReporter) {
       progressReporter.debug('Searching for Claude Code binary...');
-      progressReporter.logEnvironmentContext({
-        'NODE_PATH': process.env.NODE_PATH,
-        'PATH': process.env.PATH,
-        'HOME': process.env.HOME,
-        'PWD': process.cwd()
-      });
     }
 
     // Try to find claude executable using 'which' command
@@ -57,11 +47,9 @@ export class ClaudeApiConnector {
         
         if (actualPath && existsSync(actualPath)) {
           this.claudeExecutablePath = actualPath;
-          const version = this.getClaudeVersion(actualPath);
           
           if (progressReporter) {
-            progressReporter.logBinaryInfo(actualPath, version, process.cwd());
-            progressReporter.debug('✅ Successfully located Claude Code binary via "which" command');
+            progressReporter.debug(`✅ Found Claude Code binary: ${actualPath}`);
           }
           
           return actualPath;
@@ -97,11 +85,9 @@ export class ClaudeApiConnector {
       
       if (existsSync(path)) {
         this.claudeExecutablePath = path;
-        const version = this.getClaudeVersion(path);
         
         if (progressReporter) {
-          progressReporter.logBinaryInfo(path, version, process.cwd());
-          progressReporter.debug('✅ Found Claude Code binary at common path');
+          progressReporter.debug(`✅ Found Claude Code binary: ${path}`);
         }
         
         return path;
@@ -134,11 +120,6 @@ export class ClaudeApiConnector {
     if (progressReporter) {
       if (claudePath) {
         progressReporter.debug(`Using Claude Code binary: ${claudePath}`);
-        progressReporter.logExecutionCommand(
-          'node',
-          [claudePath, '--query'],
-          process.pid
-        );
       } else {
         progressReporter.debug('⚠️  No Claude Code binary found - query may fail');
       }

@@ -89,6 +89,6 @@ REMEMBER: Text response only, no file operations or tool usage.`;
       yield { type: 'result', result: 'Response' };
     });
 
-    await expect(client.execute('Test prompt', { timeout: 1000 })).rejects.toThrow('Claude Code process timed out');
+    await expect(client.execute('Test prompt', { timeout: 1000 })).rejects.toThrow('Timeout after 1000ms');
   });
 });

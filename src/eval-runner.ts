@@ -8,7 +8,7 @@ import { EvaluationResult, BatchResult } from './utils/result-formatter.js';
 import { ProgressReporter } from './utils/progress-reporter.js';
 import { TerminalProgressManager } from './utils/terminal-progress-manager.js';
 import { BaseProgressReporter } from './utils/base-progress-reporter.js';
-import { formatErrorDetails, getErrorSuggestions, EvaluationError } from './utils/errors.js';
+import { EvaluationError } from './utils/errors.js';
 
 export interface RunnerOptions {
   concurrency?: number;
@@ -61,30 +61,21 @@ export class EvalRunner {
       
       return result;
     } catch (error) {
-      // Wrap the error with evaluation context
+      // Simple error wrapping
       const evalError = error instanceof EvaluationError ? error : new EvaluationError(
         error instanceof Error ? error.message : 'Unknown error',
-        filePath,
-        evalSpec?.prompt,
-        formatErrorDetails(error)
+        filePath
       );
       
       if (progressReporter) {
-        const errorMessage = formatErrorDetails(evalError);
-        progressReporter.stepFailed('Evaluation', errorMessage);
-        
-        // Show suggestions if available
-        const suggestions = getErrorSuggestions(evalError);
-        if (progressReporter.showSuggestions && suggestions.length > 0) {
-          progressReporter.showSuggestions(suggestions);
-        }
+        progressReporter.stepFailed('Evaluation', evalError.message);
         
         const errorResult: EvaluationResult = {
           overall: false,
           criteria: [{
             criterion: 'File processing',
             passed: false,
-            reason: errorMessage
+            reason: evalError.message
           }]
         };
         progressReporter.evaluationCompleted(filePath, errorResult);
