@@ -1,6 +1,6 @@
 # claude-eval
 
-[![npm version](https://badge.fury.io/js/claude-eval.svg)](https://badge.fury.io/js/claude-eval)
+[![npm version](https://img.shields.io/npm/v/claude-eval.svg)](https://www.npmjs.com/package/claude-eval)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/Node.js-18%2B-green.svg)](https://nodejs.org/)
 
