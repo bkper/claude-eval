@@ -20,18 +20,18 @@ export class ClaudeClient {
     
     if (progressReporter) {
       progressReporter.stepStarted('Executing prompt with Claude Code');
-      progressReporter.debug(`Prompt length: ${prompt.length} characters`);
     }
     
     const timeoutPromise = new Promise<never>((_, reject) => {
       setTimeout(() => reject(new Error(`Timeout after ${timeout}ms`)), timeout);
     });
 
-    prompt = `Respond to the following prompt with text only. Do NOT use any tools, create/modify/delete files, or execute commands. Just provide a direct text response.
-
-User prompt: ${prompt}
-
-REMEMBER: Text response only, no file operations or tool usage.`
+    prompt = `${prompt} 
+    
+    - IMPORTANT: Output the plan text here.
+    - If you don't know how to build a plan, just interpret the prompt and output the reponse text here.
+    
+    `
     
     const queryPromise = (async () => {
       const messages = [];
@@ -41,7 +41,7 @@ REMEMBER: Text response only, no file operations or tool usage.`
         const queryOptions: Options = { 
           cwd: options.cwd, 
           model: 'sonnet',
-          permissionMode: 'default'
+          permissionMode: 'plan'
         };
         
         if (progressReporter) {
