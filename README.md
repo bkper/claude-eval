@@ -61,7 +61,7 @@ expected_behavior:
 ## How It Works
 
 1. **Parse YAML**: Loads and validates the evaluation specification
-2. **Query Claude**: Executes the prompt on **Sonnet** model, forcing text response
+2. **Query Claude**: Executes the prompt on **Sonnet** model, on plan mode
 3. **Judge Response**: Uses simplified LLM-as-a-judge with **Haiku** model, to evaluate the response against each criteria
 4. **Format Results**: Displays results with ✅/❌ indicators and summary
 

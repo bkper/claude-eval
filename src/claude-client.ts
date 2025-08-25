@@ -26,7 +26,9 @@ export class ClaudeClient {
       setTimeout(() => reject(new Error(`Timeout after ${timeout}ms`)), timeout);
     });
 
-    prompt = `${prompt} 
+    prompt = `FRESH EVALUATION SESSION: Ignore any previous context or conversation history. This is a completely independent evaluation.
+
+${prompt} 
     
     - IMPORTANT: Output the plan text here.
     - If you don't know how to build a plan, just interpret the prompt and output the reponse text here.
