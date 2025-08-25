@@ -16,4 +16,5 @@ export interface IProgressReporter {
   logResponse(response: string): void;
   logJudgePrompt(prompt: string): void;
   logJudgeResponse(response: string): void;
+  showSuggestions?(suggestions: string[]): void;
 }

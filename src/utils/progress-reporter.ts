@@ -68,7 +68,18 @@ export class ProgressReporter implements IProgressReporter {
   stepFailed(step: string, error?: string): void {
     if (this.level === 'quiet') return;
     
-    console.log(`  ${chalk.red('❌')} ${step} failed${error ? ': ' + chalk.red(error) : ''}`);
+    // Split error message by newlines for better formatting
+    if (error && error.includes('\n')) {
+      console.log(`  ${chalk.red('❌')} ${step} failed:`);
+      const lines = error.split('\n');
+      lines.forEach(line => {
+        if (line.trim()) {
+          console.log(`     ${chalk.red(line)}`);
+        }
+      });
+    } else {
+      console.log(`  ${chalk.red('❌')} ${step} failed${error ? ': ' + chalk.red(error) : ''}`);
+    }
   }
 
   partialResponse(response: string, maxLength: number = 100): void {
@@ -108,7 +119,18 @@ export class ProgressReporter implements IProgressReporter {
   error(message: string): void {
     if (this.level === 'quiet') return;
     
-    console.error(chalk.red(`❌ Error: ${message}`));
+    // Split error message by newlines for better formatting
+    if (message.includes('\n')) {
+      const lines = message.split('\n');
+      console.error(chalk.red(`❌ Error: ${lines[0]}`));
+      lines.slice(1).forEach(line => {
+        if (line.trim()) {
+          console.error(chalk.red(`   ${line}`));
+        }
+      });
+    } else {
+      console.error(chalk.red(`❌ Error: ${message}`));
+    }
   }
 
   info(message: string): void {
@@ -165,6 +187,15 @@ export class ProgressReporter implements IProgressReporter {
     if (response.length > 500) {
       console.log(chalk.gray(`    ... (${response.length} total characters)`));
     }
+  }
+
+  showSuggestions(suggestions: string[]): void {
+    if (this.level === 'quiet' || suggestions.length === 0) return;
+    
+    console.log(chalk.yellow('\n💡 Suggestions:'));
+    suggestions.forEach(suggestion => {
+      console.log(chalk.yellow(`   • ${suggestion}`));
+    });
   }
 
   private truncateContent(content: string, maxLength: number): string {

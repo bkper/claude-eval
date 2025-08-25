@@ -9,6 +9,7 @@ import { ProgressReporter } from './utils/progress-reporter.js';
 import { TerminalProgressManager } from './utils/terminal-progress-manager.js';
 import { RegionalProgressReporter } from './utils/regional-progress-reporter.js';
 import { IProgressReporter } from './utils/progress-reporter-interface.js';
+import { formatErrorDetails, getErrorSuggestions, EvaluationError } from './utils/errors.js';
 
 export interface RunnerOptions {
   concurrency?: number;
@@ -27,6 +28,7 @@ export class EvalRunner {
   
   async runSingle(filePath: string, progressReporter?: IProgressReporter): Promise<EvaluationResult> {
     const startTime = Date.now();
+    let evalSpec: any = null;
     
     try {
       if (progressReporter) {
@@ -35,7 +37,7 @@ export class EvalRunner {
       
       // Read and parse YAML
       const yamlContent = await fs.readFile(filePath, 'utf-8');
-      const evalSpec = parseEvalSpec(yamlContent);
+      evalSpec = parseEvalSpec(yamlContent);
       
       if (progressReporter) {
         progressReporter.debug(`Found ${evalSpec.expected_behavior.length} criteria to evaluate`);
@@ -60,9 +62,24 @@ export class EvalRunner {
       
       return result;
     } catch (error) {
+      // Wrap the error with evaluation context
+      const evalError = error instanceof EvaluationError ? error : new EvaluationError(
+        error instanceof Error ? error.message : 'Unknown error',
+        filePath,
+        evalSpec?.prompt,
+        formatErrorDetails(error)
+      );
+      
       if (progressReporter) {
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        const errorMessage = formatErrorDetails(evalError);
         progressReporter.stepFailed('Evaluation', errorMessage);
+        
+        // Show suggestions if available
+        const suggestions = getErrorSuggestions(evalError);
+        if (progressReporter.showSuggestions && suggestions.length > 0) {
+          progressReporter.showSuggestions(suggestions);
+        }
+        
         const errorResult: EvaluationResult = {
           overall: false,
           criteria: [{
@@ -73,7 +90,7 @@ export class EvalRunner {
         };
         progressReporter.evaluationCompleted(filePath, errorResult);
       }
-      throw error;
+      throw evalError;
     }
   }
   

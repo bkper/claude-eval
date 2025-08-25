@@ -6,6 +6,7 @@ import { EvalRunner } from '../src/eval-runner.js';
 import { ResultFormatter } from '../src/utils/result-formatter.js';
 import { ProgressReporter, type ProgressLevel } from '../src/utils/progress-reporter.js';
 import { TerminalProgressManager } from '../src/utils/terminal-progress-manager.js';
+import { formatErrorDetails, getErrorSuggestions } from '../src/utils/errors.js';
 
 const program = new Command();
 
@@ -18,17 +19,17 @@ program
   .option('--verbose', 'Show detailed progress including partial responses')
   .option('--quiet', 'Suppress progress output')
   .action(async (files: string[], options: { concurrency: string; verbose?: boolean; quiet?: boolean }) => {
+    // Determine progress level
+    let progressLevel: ProgressLevel = 'normal';
+    if (options.quiet) {
+      progressLevel = 'quiet';
+    } else if (options.verbose) {
+      progressLevel = 'verbose';
+    }
+    
     try {
       const runner = new EvalRunner();
       const formatter = new ResultFormatter();
-      
-      // Determine progress level
-      let progressLevel: ProgressLevel = 'normal';
-      if (options.quiet) {
-        progressLevel = 'quiet';
-      } else if (options.verbose) {
-        progressLevel = 'verbose';
-      }
       
       const progressReporter = new ProgressReporter({ level: progressLevel });
       
@@ -80,15 +81,36 @@ program
         process.exit(hasFailures ? 1 : 0);
       }
     } catch (error) {
-      if (error instanceof Error) {
-        if (error.message.includes('ENOENT') || error.message.includes('no such file')) {
-          console.error('Error: file not found');
-        } else {
-          console.error(`Error: ${error.message}`);
+      // Format error details for display
+      const errorDetails = formatErrorDetails(error);
+      const suggestions = getErrorSuggestions(error);
+      
+      // Display the error
+      if (progressLevel !== 'quiet') {
+        console.error(`\n${errorDetails}`);
+        
+        // Show suggestions if available
+        if (suggestions.length > 0) {
+          console.error('\n💡 Suggestions:');
+          suggestions.forEach(suggestion => {
+            console.error(`   • ${suggestion}`);
+          });
+        }
+        
+        // In verbose mode, show the full stack trace
+        if (progressLevel === 'verbose' && error instanceof Error && error.stack) {
+          console.error('\nStack trace:');
+          console.error(error.stack);
         }
       } else {
-        console.error('Unknown error occurred');
+        // In quiet mode, just show the basic error message
+        if (error instanceof Error) {
+          console.error(`Error: ${error.message}`);
+        } else {
+          console.error('Unknown error occurred');
+        }
       }
+      
       process.exit(1);
     }
   });

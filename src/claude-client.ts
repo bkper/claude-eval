@@ -1,5 +1,6 @@
 import { query } from '@anthropic-ai/claude-code';
 import { IProgressReporter } from './utils/progress-reporter-interface.js';
+import { ClaudeProcessError, ClaudeTimeoutError, ClaudeAPIError } from './utils/errors.js';
 
 export interface ClaudeOptions {
   timeout?: number;
@@ -20,7 +21,7 @@ export class ClaudeClient {
     }
     
     const timeoutPromise = new Promise<never>((_, reject) => {
-      setTimeout(() => reject(new Error('timeout')), timeout);
+      setTimeout(() => reject(new ClaudeTimeoutError(timeout, `Working directory: ${options.cwd || process.cwd()}`)), timeout);
     });
 
     prompt = `Respond to the following prompt with text only. Do NOT use any tools, create/modify/delete files, or execute commands. Just provide a direct text response.
@@ -32,19 +33,73 @@ REMEMBER: Text response only, no file operations or tool usage.`
     const queryPromise = (async () => {
       const messages = [];
       let responseText = '';
+      let errorDetails: any = null;
       
-      for await (const message of query({ prompt, options: { permissionMode: 'default', cwd: options.cwd, model: 'sonnet' } })) {
-        messages.push(message);
-        
-        // Show partial responses in verbose mode
-        if (message.type === 'result' && progressReporter) {
-          const newContent = (message as any).result || '';
-          if (newContent && newContent.length > 0) {
-            responseText += newContent;
-            progressReporter.partialResponse(responseText, 200);
+      try {
+        for await (const message of query({ prompt, options: { permissionMode: 'default', cwd: options.cwd, model: 'sonnet' } })) {
+          messages.push(message);
+          
+          // Capture error messages (check for any error-like properties)
+          if ((message as any).error || (message as any).exitCode) {
+            errorDetails = message;
+            if (progressReporter) {
+              progressReporter.debug(`Claude Code error: ${JSON.stringify(message)}`);
+            }
+          }
+          
+          // Show partial responses in verbose mode
+          if (message.type === 'result' && progressReporter) {
+            const newContent = (message as any).result || '';
+            if (newContent && newContent.length > 0) {
+              responseText += newContent;
+              progressReporter.partialResponse(responseText, 200);
+            }
           }
         }
+      } catch (queryError: any) {
+        // Handle errors from the query stream itself
+        if (queryError.message?.includes('process exited with code')) {
+          const exitCodeMatch = queryError.message.match(/code (\d+)/);
+          const exitCode = exitCodeMatch ? parseInt(exitCodeMatch[1]) : undefined;
+          
+          throw new ClaudeProcessError(
+            'Claude Code process failed',
+            exitCode,
+            queryError.stderr || '',
+            queryError.stdout || '',
+            `Working directory: ${options.cwd || process.cwd()}\nOriginal error: ${queryError.message}`
+          );
+        } else if (queryError.code === 'ENOENT') {
+          throw new ClaudeProcessError(
+            'Claude Code CLI not found',
+            undefined,
+            'Command not found: claude',
+            '',
+            'Make sure @anthropic-ai/claude-code is installed globally or locally'
+          );
+        } else if (queryError.response?.status) {
+          throw new ClaudeAPIError(
+            `Claude API error: ${queryError.message}`,
+            queryError.response.status,
+            queryError.response.data,
+            `Working directory: ${options.cwd || process.cwd()}`
+          );
+        } else {
+          throw queryError;
+        }
       }
+      
+      // Check if we got an error in the messages
+      if (errorDetails) {
+        throw new ClaudeProcessError(
+          errorDetails.error || 'Claude Code execution failed',
+          errorDetails.exitCode,
+          errorDetails.stderr || '',
+          errorDetails.stdout || '',
+          `Working directory: ${options.cwd || process.cwd()}`
+        );
+      }
+      
       return messages;
     })();
     

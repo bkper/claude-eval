@@ -168,6 +168,15 @@ export class BufferedRegionalReporter implements RegionalProgressReporter {
     }
   }
 
+  showSuggestions(suggestions: string[]): void {
+    if (this.level === 'quiet' || suggestions.length === 0) return;
+    
+    this.buffer.add(chalk.yellow('\n💡 Suggestions:'));
+    suggestions.forEach(suggestion => {
+      this.buffer.add(chalk.yellow(`   • ${suggestion}`));
+    });
+  }
+
   private truncateContent(content: string, maxLength: number): string {
     if (content.length <= maxLength) {
       return content;
