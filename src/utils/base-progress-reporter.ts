@@ -31,8 +31,7 @@ export abstract class BaseProgressReporter {
     // Show detailed per-criteria results
     for (const criterion of result.criteria) {
       const icon = criterion.passed ? chalk.green('✓') : chalk.red('✗');
-      const reasonText = criterion.reason ? `: ${criterion.reason}` : '';
-      this.output(`    ${icon} ${criterion.criterion}${reasonText}`);
+      this.output(`    ${icon} ${criterion.reason || criterion.criterion}`);
     }
   }
 

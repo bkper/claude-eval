@@ -91,7 +91,7 @@ Response to evaluate:
 ${response}
 
 Criteria to evaluate against:
-${criteria.map((c, i) => `${i + 1}. ${c}`).join('\n')}
+${criteria.map((c, i) => `${c}`).join('\n')}
 
 For each criterion, respond with either:
 - ✅ [Brief reason why it passes]
