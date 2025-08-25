@@ -7,7 +7,6 @@ import { JudgeEvaluator } from './judge-evaluator.js';
 import { EvaluationResult, BatchResult } from './utils/result-formatter.js';
 import { ProgressReporter } from './utils/progress-reporter.js';
 import { TerminalProgressManager } from './utils/terminal-progress-manager.js';
-import { RegionalProgressReporter } from './utils/regional-progress-reporter.js';
 import { IProgressReporter } from './utils/progress-reporter-interface.js';
 import { formatErrorDetails, getErrorSuggestions, EvaluationError } from './utils/errors.js';
 
@@ -108,19 +107,19 @@ export class EvalRunner {
     
     const promises = filePaths.map((filePath, index) => 
       limit(async () => {
-        // Create a unique region ID for this evaluation
-        const regionId = `eval_${index}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        // Create a unique buffer ID for this evaluation
+        const bufferId = `eval_${index}_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
         
         try {
-          // Create a regional progress reporter for this evaluation
-          const regionalReporter = terminalProgressManager?.createRegionalReporter(regionId, index + 1);
+          // Create a buffered progress reporter for this evaluation
+          const bufferedReporter = terminalProgressManager?.createBufferedReporter(bufferId, index + 1);
           
-          // Run the evaluation with the regional reporter
-          const result = await this.runSingle(filePath, regionalReporter);
+          // Run the evaluation with the buffered reporter
+          const result = await this.runSingle(filePath, bufferedReporter);
           
-          // Mark the region as completed
+          // Mark the buffer as completed
           if (terminalProgressManager) {
-            terminalProgressManager.markRegionCompleted(regionId, result.overall);
+            terminalProgressManager.markBufferCompleted(bufferId, result.overall);
           }
           
           return { file: filePath, result };
@@ -128,10 +127,10 @@ export class EvalRunner {
           // Return failed result for individual file errors
           const errorMessage = error instanceof Error ? error.message : 'Unknown error';
           
-          // Mark region as failed and show error
+          // Mark buffer as failed and show error
           if (terminalProgressManager) {
             terminalProgressManager.error(`Failed to process ${filePath}: ${errorMessage}`);
-            terminalProgressManager.markRegionCompleted(regionId, false);
+            terminalProgressManager.markBufferCompleted(bufferId, false);
           }
           
           return {

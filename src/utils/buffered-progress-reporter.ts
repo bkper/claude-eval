@@ -4,34 +4,31 @@ import { IProgressReporter } from './progress-reporter-interface.js';
 import { OutputBuffer, TerminalFormatter } from './terminal-utils.js';
 import type { EvaluationResult } from './result-formatter.js';
 
-export interface RegionalProgressReporter extends IProgressReporter {
-  // Additional methods specific to regional reporters if needed
-}
 
-export class BufferedRegionalReporter implements RegionalProgressReporter {
+export class BufferedProgressReporter implements IProgressReporter {
   private level: ProgressLevel;
   private buffer: OutputBuffer;
-  private regionId: string;
+  private bufferId: string;
   private filename: string = '';
   private startTime: number = 0;
   private evaluationIndex: number;
   private totalEvaluations: number;
 
   constructor(
-    regionId: string,
+    bufferId: string,
     level: ProgressLevel,
     evaluationIndex: number,
     totalEvaluations: number
   ) {
     this.level = level;
     this.buffer = new OutputBuffer();
-    this.regionId = regionId;
+    this.bufferId = bufferId;
     this.evaluationIndex = evaluationIndex;
     this.totalEvaluations = totalEvaluations;
   }
 
-  getRegionId(): string {
-    return this.regionId;
+  getBufferId(): string {
+    return this.bufferId;
   }
 
   getBuffer(): OutputBuffer {

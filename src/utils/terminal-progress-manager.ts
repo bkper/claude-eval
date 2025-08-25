@@ -1,9 +1,9 @@
 import { ProgressLevel } from './progress-reporter.js';
-import { BufferedRegionalReporter, RegionalProgressReporter } from './regional-progress-reporter.js';
+import { BufferedProgressReporter } from './buffered-progress-reporter.js';
 import { SimpleProgressIndicator, TerminalFormatter } from './terminal-utils.js';
 
-export interface EvaluationRegion {
-  reporter: BufferedRegionalReporter;
+export interface EvaluationBuffer {
+  reporter: BufferedProgressReporter;
   completed: boolean;
   success?: boolean;
   completionTime?: number;
@@ -11,7 +11,7 @@ export interface EvaluationRegion {
 
 export class TerminalProgressManager {
   private level: ProgressLevel;
-  private regions: Map<string, EvaluationRegion> = new Map();
+  private buffers: Map<string, EvaluationBuffer> = new Map();
   private totalEvaluations: number = 0;
   private completedCount: number = 0;
   private batchStartTime: number = 0;
@@ -31,7 +31,7 @@ export class TerminalProgressManager {
     this.completedCount = 0;
     this.batchStartTime = Date.now();
     this.concurrency = concurrency;
-    this.regions.clear();
+    this.buffers.clear();
     
     // Start progress indicator for all evaluations
     this.isShowingProgress = true;
@@ -39,15 +39,15 @@ export class TerminalProgressManager {
     this.updateProgressIndicator();
   }
 
-  createRegionalReporter(regionId: string, evaluationIndex: number): BufferedRegionalReporter {
-    const reporter = new BufferedRegionalReporter(
-      regionId,
+  createBufferedReporter(bufferId: string, evaluationIndex: number): BufferedProgressReporter {
+    const reporter = new BufferedProgressReporter(
+      bufferId,
       this.level,
       evaluationIndex,
       this.totalEvaluations
     );
     
-    this.regions.set(regionId, {
+    this.buffers.set(bufferId, {
       reporter,
       completed: false
     });
@@ -55,13 +55,13 @@ export class TerminalProgressManager {
     return reporter;
   }
 
-  markRegionCompleted(regionId: string, success: boolean): void {
-    const region = this.regions.get(regionId);
-    if (!region) return;
+  markBufferCompleted(bufferId: string, success: boolean): void {
+    const buffer = this.buffers.get(bufferId);
+    if (!buffer) return;
     
-    region.completed = true;
-    region.success = success;
-    region.completionTime = Date.now();
+    buffer.completed = true;
+    buffer.success = success;
+    buffer.completionTime = Date.now();
     this.completedCount++;
     
     // Update progress indicator
@@ -69,8 +69,8 @@ export class TerminalProgressManager {
       this.updateProgressIndicator();
     }
     
-    // Display completed region immediately
-    this.displayCompletedRegion(region);
+    // Display completed buffer immediately
+    this.displayCompletedBuffer(buffer);
     
     // Check if batch is complete
     if (this.completedCount === this.totalEvaluations) {
@@ -87,7 +87,7 @@ export class TerminalProgressManager {
     this.progressIndicator.update(message);
   }
 
-  private displayCompletedRegion(region: EvaluationRegion): void {
+  private displayCompletedBuffer(buffer: EvaluationBuffer): void {
     if (this.level === 'quiet') return;
     
     // Stop progress indicator temporarily to display output cleanly
@@ -95,10 +95,10 @@ export class TerminalProgressManager {
       this.progressIndicator.stop();
     }
     
-    // Display the buffered output for this completed region
-    const buffer = region.reporter.getBuffer();
-    if (!buffer.isEmpty()) {
-      console.log(buffer.toString());
+    // Display the buffered output for this completed buffer
+    const outputBuffer = buffer.reporter.getBuffer();
+    if (!outputBuffer.isEmpty()) {
+      console.log(outputBuffer.toString());
     }
     
     // Restart progress indicator if batch isn't complete
@@ -119,8 +119,8 @@ export class TerminalProgressManager {
     
     // Calculate final statistics
     const batchDuration = Date.now() - this.batchStartTime;
-    const passedCount = Array.from(this.regions.values())
-      .filter(region => region.success === true).length;
+    const passedCount = Array.from(this.buffers.values())
+      .filter(buffer => buffer.success === true).length;
     
     // Show final summary
     console.log(TerminalFormatter.formatBatchSummary(passedCount, this.totalEvaluations, batchDuration));
@@ -129,13 +129,13 @@ export class TerminalProgressManager {
     if (this.totalEvaluations > 1) {
       console.log('\n📊 Results summary:');
       
-      // Sort regions by completion time for consistent display
-      const sortedRegions = Array.from(this.regions.values())
+      // Sort buffers by completion time for consistent display
+      const sortedBuffers = Array.from(this.buffers.values())
         .sort((a, b) => (a.completionTime || 0) - (b.completionTime || 0));
       
-      for (const region of sortedRegions) {
-        const filename = region.reporter.getFilename();
-        if (region.success === true) {
+      for (const buffer of sortedBuffers) {
+        const filename = buffer.reporter.getFilename();
+        if (buffer.success === true) {
           console.log(TerminalFormatter.formatSuccess(filename));
         } else {
           console.log(TerminalFormatter.formatError(filename));
