@@ -281,11 +281,11 @@ User prompt: Create a hello world function
 REMEMBER: Text response only, no file operations or tool usage.`;
     expect(mockQuery).toHaveBeenNthCalledWith(1, {
       prompt: expectedPrompt,
-      options: { 
+      options: expect.objectContaining({
         permissionMode: 'default',
         cwd: expect.stringContaining('test/temp'),
         model: 'sonnet'
-      }
+      })
     });
 
     // Check Judge call

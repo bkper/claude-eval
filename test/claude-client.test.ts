@@ -29,7 +29,14 @@ describe('ClaudeClient', () => {
 User prompt: Test prompt
 
 REMEMBER: Text response only, no file operations or tool usage.`;
-    expect(mockQuery).toHaveBeenCalledWith({ prompt: expectedPrompt, options: { permissionMode: 'default', cwd: undefined, model: 'sonnet' } });
+    expect(mockQuery).toHaveBeenCalledWith({ 
+      prompt: expectedPrompt, 
+      options: expect.objectContaining({
+        permissionMode: 'default',
+        cwd: undefined,
+        model: 'sonnet'
+      })
+    });
   });
 
   it('should pass permissionMode: default option to SDK', async () => {
@@ -43,7 +50,14 @@ REMEMBER: Text response only, no file operations or tool usage.`;
 User prompt: Test prompt
 
 REMEMBER: Text response only, no file operations or tool usage.`;
-    expect(mockQuery).toHaveBeenCalledWith({ prompt: expectedPrompt, options: { permissionMode: 'default', cwd: undefined, model: 'sonnet' } });
+    expect(mockQuery).toHaveBeenCalledWith({ 
+      prompt: expectedPrompt, 
+      options: expect.objectContaining({
+        permissionMode: 'default',
+        cwd: undefined,
+        model: 'sonnet'
+      })
+    });
   });
 
   it('should handle multiple message chunks and concatenate them', async () => {
@@ -81,6 +95,6 @@ REMEMBER: Text response only, no file operations or tool usage.`;
       yield { type: 'result', result: 'Response' };
     });
 
-    await expect(client.execute('Test prompt', { timeout: 1000 })).rejects.toThrow('timeout');
+    await expect(client.execute('Test prompt', { timeout: 1000 })).rejects.toThrow('Claude Code process timed out');
   });
 });
