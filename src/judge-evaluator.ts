@@ -1,11 +1,11 @@
 import type { EvaluationResult, CriterionResult } from './utils/result-formatter.js';
 import { IProgressReporter } from './utils/progress-reporter-interface.js';
-import { ClaudeClient } from './claude-client.js';
+import { ClaudeApiConnector } from './claude-api-connector.js';
 
 export type { EvaluationResult, CriterionResult };
 
 export class JudgeEvaluator {
-  private claudeClient = new ClaudeClient();
+  private apiConnector = new ClaudeApiConnector();
 
   async evaluate(response: string, criteria: string[], progressReporter?: IProgressReporter): Promise<EvaluationResult> {
     const startTime = Date.now();
@@ -25,7 +25,7 @@ export class JudgeEvaluator {
       const messages = [];
       let judgeResponseText = '';
       
-      for await (const message of this.claudeClient.queryRaw(judgePrompt, { permissionMode: 'default', model: 'haiku' })) {
+      for await (const message of this.apiConnector.queryRaw(judgePrompt, { permissionMode: 'default', model: 'haiku' })) {
         messages.push(message);
         
         // Show partial judge responses in verbose mode
