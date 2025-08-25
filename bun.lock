@@ -4,7 +4,6 @@
     "": {
       "name": "claude-code-eval",
       "dependencies": {
-        "@anthropic-ai/claude-code": "^1.0.88",
         "chalk": "^5.6.0",
         "commander": "^14.0.0",
         "glob": "^11.0.3",
@@ -19,6 +18,7 @@
         "ts-jest": "^29.4.1",
       },
       "peerDependencies": {
+        "@anthropic-ai/claude-code": ">=1.0.88",
         "typescript": "^5",
       },
     },
@@ -26,7 +26,7 @@
   "packages": {
     "@ampproject/remapping": ["@ampproject/remapping@2.3.0", "", { "dependencies": { "@jridgewell/gen-mapping": "^0.3.5", "@jridgewell/trace-mapping": "^0.3.24" } }, "sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw=="],
 
-    "@anthropic-ai/claude-code": ["@anthropic-ai/claude-code@1.0.88", "", { "optionalDependencies": { "@img/sharp-darwin-arm64": "^0.33.5", "@img/sharp-darwin-x64": "^0.33.5", "@img/sharp-linux-arm": "^0.33.5", "@img/sharp-linux-arm64": "^0.33.5", "@img/sharp-linux-x64": "^0.33.5", "@img/sharp-win32-x64": "^0.33.5" }, "bin": { "claude": "cli.js" } }, "sha512-Np6H4EjkbmNolUpx98DvqLXV/iJrw2y7dz2rDJ7av9ajMz6HZfB8bdJV5D75+jO+Gk1pvA54HCIm0c65lDrzcw=="],
+    "@anthropic-ai/claude-code": ["@anthropic-ai/claude-code@1.0.90", "", { "optionalDependencies": { "@img/sharp-darwin-arm64": "^0.33.5", "@img/sharp-darwin-x64": "^0.33.5", "@img/sharp-linux-arm": "^0.33.5", "@img/sharp-linux-arm64": "^0.33.5", "@img/sharp-linux-x64": "^0.33.5", "@img/sharp-win32-x64": "^0.33.5" }, "bin": { "claude": "cli.js" } }, "sha512-waC7GC4fnfyiFVFTS7Eo4MAS/iEYpyM67JZFXr+B07bOkjBYtBqXh77+Z/btcyI8NxvUtpnFS0R5FXkU/tKCwg=="],
 
     "@babel/code-frame": ["@babel/code-frame@7.27.1", "", { "dependencies": { "@babel/helper-validator-identifier": "^7.27.1", "js-tokens": "^4.0.0", "picocolors": "^1.1.1" } }, "sha512-cjQ7ZlQ0Mv3b47hABuTevyTuYN4i+loJKGeV9flcCgIK37cCXRh+L1bd3iBHlynerhQ7BhCkn2BPbQUL+rGqFg=="],
 
