@@ -7,7 +7,7 @@
 
 An evaluation tool for [Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview), using a [LLM-as-a-judge](https://towardsdatascience.com/llm-as-a-judge-a-practical-guide/) simplified approach. 
 
-When changing Claude Code contexts and models:
+When changing Claude Code memories, commands, agents and models:
 
 - How can you know if the change work as expected?
 - How can you know if the change will NOT break something else?
