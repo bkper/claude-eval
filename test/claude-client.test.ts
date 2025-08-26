@@ -24,38 +24,44 @@ describe('ClaudeClient', () => {
 
     const result = await client.execute('Test prompt');
     expect(result).toBe(mockResponse);
-    const expectedPrompt = `Respond to the following prompt with text only. Do NOT use any tools, create/modify/delete files, or execute commands. Just provide a direct text response.
+    const expectedPrompt = `FRESH EVALUATION SESSION: Ignore any previous context or conversation history. This is a completely independent evaluation.
 
-User prompt: Test prompt
-
-REMEMBER: Text response only, no file operations or tool usage.`;
+Test prompt 
+    
+    - IMPORTANT: Output the plan text here.
+    - If you don't know how to build a plan, just interpret the prompt and output the reponse text here.
+    
+    `;
     expect(mockQuery).toHaveBeenCalledWith({
       prompt: expectedPrompt,
       options: expect.objectContaining({
         cwd: undefined,
         model: 'sonnet',
-        permissionMode: 'default'
+        permissionMode: 'plan'
       })
     });
   });
 
-  it('should pass permissionMode: default option to SDK', async () => {
+  it('should pass permissionMode: plan option to SDK', async () => {
     mockQuery.mockImplementation(async function* () {
       yield { type: 'result', result: 'Response' };
     });
 
     await client.execute('Test prompt');
-    const expectedPrompt = `Respond to the following prompt with text only. Do NOT use any tools, create/modify/delete files, or execute commands. Just provide a direct text response.
+    const expectedPrompt = `FRESH EVALUATION SESSION: Ignore any previous context or conversation history. This is a completely independent evaluation.
 
-User prompt: Test prompt
-
-REMEMBER: Text response only, no file operations or tool usage.`;
+Test prompt 
+    
+    - IMPORTANT: Output the plan text here.
+    - If you don't know how to build a plan, just interpret the prompt and output the reponse text here.
+    
+    `;
     expect(mockQuery).toHaveBeenCalledWith({
       prompt: expectedPrompt,
       options: expect.objectContaining({
         cwd: undefined,
         model: 'sonnet',
-        permissionMode: 'default'
+        permissionMode: 'plan'
       })
     });
   });

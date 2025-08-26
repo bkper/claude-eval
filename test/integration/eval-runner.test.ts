@@ -274,15 +274,18 @@ expected_behavior:
     await runner.runSingle(testFile);
 
     // Check Claude call
-    const expectedPrompt = `Respond to the following prompt with text only. Do NOT use any tools, create/modify/delete files, or execute commands. Just provide a direct text response.
+    const expectedPrompt = `FRESH EVALUATION SESSION: Ignore any previous context or conversation history. This is a completely independent evaluation.
 
-User prompt: Create a hello world function
-
-REMEMBER: Text response only, no file operations or tool usage.`;
+Create a hello world function 
+    
+    - IMPORTANT: Output the plan text here.
+    - If you don't know how to build a plan, just interpret the prompt and output the reponse text here.
+    
+    `;
     expect(mockQuery).toHaveBeenNthCalledWith(1, {
       prompt: expectedPrompt,
       options: expect.objectContaining({
-        permissionMode: 'default',
+        permissionMode: 'plan',
         cwd: expect.stringContaining('test/temp'),
         model: 'sonnet'
       })
