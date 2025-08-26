@@ -2,17 +2,23 @@
 
 import { Command } from 'commander';
 import { glob } from 'glob';
+import { createRequire } from 'module';
 import { EvalRunner } from '../src/eval-runner.js';
 import { ResultFormatter } from '../src/utils/result-formatter.js';
 import { ProgressReporter, type ProgressLevel } from '../src/utils/progress-reporter.js';
 import { TerminalProgressManager } from '../src/utils/terminal-progress-manager.js';
+import { checkForUpdates } from '../src/utils/update-checker.js';
+
+// Import package.json to get current version
+const require = createRequire(import.meta.url);
+const packageJson = require('../../package.json');
 
 const program = new Command();
 
 program
   .name('claude-eval')
   .description('Evaluation system for AI agent responses using LLM-as-a-judge methodology')
-  .version('1.0.0')
+  .version(packageJson.version)
   .argument('<files...>', 'YAML evaluation files or glob patterns')
   .option('--concurrency <number>', 'Number of concurrent evaluations', '5')
   .option('--verbose', 'Show detailed progress including partial responses')
@@ -93,6 +99,30 @@ program
         console.error('\nUnknown error occurred');
       }
 
+      process.exit(1);
+    }
+  });
+
+// Add update command
+program
+  .command('update')
+  .description('Check for updates to claude-eval')
+  .action(async () => {
+    try {
+      console.log(`Current version: ${packageJson.version}`);
+      console.log('Checking for updates...');
+      
+      const updateInfo = await checkForUpdates('claude-eval', packageJson.version);
+      
+      if (updateInfo.isUpToDate) {
+        console.log(`\x1b[32mClaude-eval is up to date (${updateInfo.currentVersion})\x1b[0m`);
+      } else {
+        console.log(`\x1b[33mUpdate available: ${updateInfo.latestVersion}\x1b[0m`);
+        console.log(`\nTo update, run: \x1b[36mnpm update -g claude-eval\x1b[0m`);
+        console.log(`Or with bun: \x1b[36mbun update -g claude-eval\x1b[0m`);
+      }
+    } catch (error) {
+      console.error('Error checking for updates:', error instanceof Error ? error.message : 'Unknown error');
       process.exit(1);
     }
   });

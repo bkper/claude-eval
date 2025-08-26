@@ -25,18 +25,52 @@ It's like TDD for AI.
 - Node.js 18+ or Bun
 - [Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview) installed and configured in your project
 
+## Installation
+
+### Global Installation (Recommended)
+
+For regular use, install claude-eval globally:
+
+```bash
+# Using npm
+npm install -g claude-eval
+
+# Using bun
+bun install -g claude-eval
+```
+
+After global installation, you can use the `claude-eval` command directly and access the update functionality:
+
+```bash
+claude-eval --version
+claude-eval update
+```
+
+### One-time Usage
+
+If you prefer not to install globally, you can run evaluations directly with npx:
+
+```bash
+npx claude-eval evals/*.yaml
+```
 
 ## Usage
 
 ```bash
 # Single evaluation
-npx claude-eval evals/say-dont-know-clear-way.yaml
+claude-eval evals/say-dont-know-clear-way.yaml
 
 # Multiple evaluations (batch)
-npx claude-eval evals/*.yaml
+claude-eval evals/*.yaml
 
 # Custom concurrency
-npx claude-eval evals/*.yaml --concurrency=3
+claude-eval evals/*.yaml --concurrency=3
+
+# Check for updates
+claude-eval update
+
+# Show help
+claude-eval --help
 ```
 
 ## Evaluation File Format
