@@ -116,7 +116,16 @@ export abstract class BaseProgressReporter {
     }
   }
 
-
+  logPrompt(prompt: string): void {
+    if (this.level !== 'verbose') return;
+    
+    const truncated = this.truncateContent(prompt, 500);
+    this.output(chalk.blue(`📝 Prompt sent to Claude:`));
+    this.output(chalk.gray(`${truncated}`));
+    if (prompt.length > 500) {
+      this.output(chalk.gray(`    ... (${prompt.length} total characters)`));
+    }
+  }
 
   protected truncateContent(content: string, maxLength: number): string {
     if (content.length <= maxLength) {

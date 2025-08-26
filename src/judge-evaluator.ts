@@ -95,8 +95,8 @@ Criteria to evaluate against:
 ${criteria.map(c => `${c}`).join('\n')}
 
 For each criterion, respond with either:
-- ✅ [Brief reason why it passes]
-- ❌ [Brief reason why it fails]
+- ✅ [Brief reason why it passes - when it passes only]
+- ❌ [Brief reason why it fails - when it fails only]
 
 Format your response clearly with one line per criterion.`;
   }

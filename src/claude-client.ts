@@ -26,14 +26,13 @@ export class ClaudeClient {
       setTimeout(() => reject(new Error(`Timeout after ${timeout}ms`)), timeout);
     });
 
-    prompt = `FRESH EVALUATION SESSION: Ignore any previous context or conversation history. This is a completely independent evaluation.
-
-${prompt} 
-    
-    - IMPORTANT: Output the plan text here.
-    - If you don't know how to build a plan, just interpret the prompt and output the reponse text here.
-    
-    `
+    if (!prompt.startsWith("/")) {
+      prompt = `FRESH EVALUATION SESSION: Ignore any previous context or conversation history. This is a completely independent evaluation.
+      ${prompt} 
+      - IMPORTANT: Output the plan text here.
+      - If you don't know how to build a plan, just interpret the prompt and output the reponse text here.
+      `
+    }
     
     const queryPromise = (async () => {
       const messages = [];
@@ -49,6 +48,7 @@ ${prompt}
         if (progressReporter) {
           progressReporter.debug(`Starting Claude Code query with working directory: ${options.cwd || process.cwd()}`);
           progressReporter.debug(`Query options: ${JSON.stringify({ cwd: queryOptions.cwd, model: queryOptions.model }, null, 2)}`);
+          progressReporter.logPrompt(prompt);
         }
         
         for await (const message of query({ prompt, options: queryOptions })) {
