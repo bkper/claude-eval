@@ -1,15 +1,15 @@
 # claude-eval
 
 [![npm version](https://img.shields.io/npm/v/claude-eval.svg)](https://www.npmjs.com/package/claude-eval)
+[![npm downloads](https://img.shields.io/npm/dm/claude-eval.svg)](https://www.npmjs.com/package/claude-eval)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/Node.js-18%2B-green.svg)](https://nodejs.org/)
 
-An evaluation tool for [Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview) using a [LLM-as-a-judge](https://towardsdatascience.com/llm-as-a-judge-a-practical-guide/) simplified approach. 
+An evaluation tool for [Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview), using a [LLM-as-a-judge](https://towardsdatascience.com/llm-as-a-judge-a-practical-guide/) simplified approach. 
 
 When changing Claude Code contexts and models:
 
 - How can you know if the change work as expected?
-- How can you know it was a good or a bad change?
 - How can you know if the change will NOT break something else?
 
 This tool solves those problems by enabling Eval-driven development for Claude Code. 
@@ -96,7 +96,7 @@ expected_behavior:
 
 1. **Parse YAML**: Loads and validates the evaluation specification
 2. **Query Claude**: Executes the prompt on **Sonnet** model, on plan mode
-3. **Judge Response**: Uses simplified LLM-as-a-judge with **Haiku** model, to evaluate the response against each criteria
+3. **Judge Response**: Evaluate the response with **Haiku** model
 4. **Format Results**: Displays results with ✅/❌ indicators and summary
 
 ## Contributing

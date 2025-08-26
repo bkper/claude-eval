@@ -17,7 +17,7 @@ const program = new Command();
 
 program
   .name('claude-eval')
-  .description('Evaluation system for AI agent responses using LLM-as-a-judge methodology')
+  .description('Evaluation tool for Claude Code, using a LLM-as-a-judge simplified approach.')
   .version(packageJson.version)
   .argument('<files...>', 'YAML evaluation files or glob patterns')
   .option('--concurrency <number>', 'Number of concurrent evaluations', '5')
